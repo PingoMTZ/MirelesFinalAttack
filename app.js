@@ -74,6 +74,26 @@ app.post("/register", async (req, res) => {
     }
 });
 
+// Ruta de cierre de sesión
+app.post('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.send('Error al cerrar sesión');
+        }
+        res.send('Sesión cerrada');
+    });
+});
+
+// Ruta para comprobar si el usuario está autenticado
+app.get('/proyects', (req, res) => {
+    if (req.session.user) {
+        res.send('Bienvenido, ${req.session.user}');
+    } else {
+        res.send('Debes iniciar sesión primero');
+    }
+});
+
+
 const port = process.env.PORT || 5001;
 
 connectToDatabase().then(() => {
