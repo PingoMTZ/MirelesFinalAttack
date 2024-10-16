@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Change Password</title>
+</head>
+<body>
+
+    <h1>Change Password</h1>
+
+    <form id="changePasswordForm">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="oldPassword" placeholder="Old password" required>
+        <input type="password" name="newPassword" placeholder="New password" required>
+        <button type="submit">Change</button>
+    </form>
+
+    <ul>
+        <li><a href="/">Return</a></li>
+    </ul>
+
+    <script>
+        document.getElementById("changePasswordForm").addEventListener("submit", async (event) => {
+            event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch("/changepwd", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const message = await response.text();
+                alert(message);
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Error changing password");
+            }
+        });
+    </script>
+    
+</body>
+</html>
