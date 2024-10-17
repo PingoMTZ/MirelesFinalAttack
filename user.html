@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Registro de Usuario</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container mt-5">
+            <div class="card shadow-sm">
+                <h2 class="mb-4">Registrar Usuario</h2>
+                <form id="formRegistroUsuario">
+                    <div class="mb-3">
+                        <label for="nombreUsuario" class="form-label">Nombre de Usuario</label>
+                        <input type="text" class="form-control" id="nombreUsuario" placeholder="Introduce el nombre de usuario" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="emailUsuario" class="form-label">Correo Electrónico</label>
+                        <input type="email" class="form-control" id="emailUsuario" placeholder="Introduce el correo electrónico" required>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">Registrar Usuario</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script>
+            document.getElementById('formRegistroUsuario').addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                // Obtener los datos del formulario
+                const nombreUsuario = document.getElementById('nombreUsuario').value;
+                const emailUsuario = document.getElementById('emailUsuario').value;
+
+                // Crear objeto del usuario
+                const usuario = {
+                    nombre: nombreUsuario,
+                    email: emailUsuario,
+                    proyectos: [] // Lista vacía de proyectos asociados al usuario
+                };
+
+                // Guarda el usuario en el local storage
+                localStorage.setItem('usuario', JSON.stringify(usuario));
+
+                // Depurar sí el proceso llega a este punto
+                console.log('Usuario registrado, redirigiendo...');
+
+                // Redirigir al formulario de proyectos (verificar la ruta del archivo)
+                window.location.href = 'project.html';
+            });
+        </script>
+    </body>
+</html>

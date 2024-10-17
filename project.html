@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Crear un proyecto</title>
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body {
+                background-color: #f8f9fa;
+            }
+            .container {
+                margin-top: 50px;
+            }
+            .card {
+                padding: 20px;
+            }
+            .btn-delete {
+                background-color: #dc3545;
+                color: white;
+            }
+            .btn-delete:hover {
+                background-color: #c82333;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="card shadow-sm">
+                <h2 class="mb-4">Crear Proyecto</h2>
+                <form>
+                    <!-- Nombre del proyecto -->
+                     <div class="mb-3">
+                        <label for="nombreProyecto" class="form-label">Nombre del Proyecto</label>
+                        <input type="text" class="form-control" id="nombreProyecto" placeholder="Introduce el nombre del proyecto" required>
+                     </div>
+                    <!-- Descripción del proyecto -->
+                    <div class="mb-3">
+                        <label for="descripcionProyecto" class="form-label">Descripción del Proyecto</label>
+                        <textarea class="form-control" id="descripcionProyecto" rows="4" placeholder="Describe el proyecto" required></textarea>
+                    </div>
+                    <!-- Fecha de inicio -->
+                    <div class="mb-3">
+                        <label for="fechaInicio" class="form-label">Fecha de Inicio</label>
+                        <input type="date" class="form-control" id="fechaInicio" required>
+                    </div>
+                    <!-- Fecha de fin -->
+                    <div class="mb-3">
+                        <label for="fechaFin" class="form-label">Fecha de Fin</label>
+                        <input type="date" class="form-control" id="fechaFin" required>
+                    </div>
+                    <!-- Botones de acción -->
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">Guardar Proyecto</button>
+                        <button type="reset" class="btn btn-delete">Eliminar Proyecto</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script>
+            // Verificar si tenemos un usuario registrado
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
+            if (!usuario) {
+                alert('Por favor, regístrate primero');
+                window.location.href = 'user.html';
+            } else {
+                console.log('Usuario actual: ${usuario.nombre}');
+            }
+            document.getElementById('formCrearProyecto').addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                // Obtener los datos del formulario
+                const nombreProyecto = document.getElementById('nombreProyecto').value;
+                const descripcionProyecto = document.getElementById('descripcionProyecto').value;
+                const fechaInicio = document.getElementById('fechaInicio').value;
+                const fechaFin = document.getElementById('fechaFin').value;
+
+                // Crear objeto del proyecto
+                const proyecto = {
+                    nombre: nombreProyecto,
+                    descripcion: descripcionProyecto,
+                    fechaInicio: fechaInicio,
+                    fechaFin: fechaFin
+                };
+
+                // Asociar el proyecto al usuario
+                usuario.proyectos.push(proyecto);
+
+                // Actualizar el usuario en el localStorage
+                localStorage.setItem('usuario', JSON.stringify(usuario));
+
+                // Confirmación
+                alert('Proyecto guardado con éxito');
+                window.location.reload(); // Opcional: Recargar la página o redirigir
+            });
+        </script>
+        <!-- Dependencias de Bootstrap -->
+         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>
