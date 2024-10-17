@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const path = require("path");
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
@@ -20,6 +21,11 @@ async function connectToDatabase() {
 }
 
 const app = express();
+app.use(session({
+    secret: 'your_secret_key',
+    resave: false,
+    saveUninitialized: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.set('view engine', 'ejs');
@@ -39,7 +45,9 @@ app.post("/", async (req, res) => {
         
         const passwordMatch = await bcrypt.compare(req.body.password, user.password);
         if(passwordMatch){
-            res.render("proyects");
+            req.session.user = user._id;
+            const userId = req.session.user;
+            res.render("proyects",{userId});
         }else{
             res.send("wrong data input");
         }
@@ -59,7 +67,8 @@ app.post("/register", async (req, res) => {
     const data = {
         username: req.body.username,
         email: req.body.email,
-        password: hashedPassword
+        password: hashedPassword,
+        project: []
     };
 
     try {
@@ -175,6 +184,25 @@ app.put("/delete", async (req, res) => {
         res.status(500).send("Error deleting username");
     }
 });
+
+//agregar proyecto (FEO)
+app.put("/proyecto", async (req, res) => {
+    const { userId, proyecto } = req.body; // Asegúrate de que el cuerpo tenga esta estructura
+    
+    try {
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $push: { project: proyecto } },
+            { new: true }
+        );
+        res.status(200).json({ message: 'Proyecto guardado con éxito', user: updatedUser });
+    } catch (error) {
+        console.error('Error adding project:', error);
+        res.status(500).json({ message: 'Error al guardar el proyecto. Intenta de nuevo más tarde.' });
+    }
+});
+
+
 
 app.get("/proyects", (req, res) => {
     res.render("proyects");
