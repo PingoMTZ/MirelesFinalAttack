@@ -35,6 +35,17 @@ app.get("/", (req, res) => {
     res.render("login");
 });
 
+// CHANGES HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+app.get("/logout", (req, res) => {
+    // Destroy the session to log the user out
+    req.session.destroy((err) => {
+        if (err) {
+            console.error("Error logging out:", err);
+            return res.status(500).send("Error logging out. Please try again.");
+        }
+        res.redirect("/"); // Redirect to the login page after logout
+    });
+});
 
 app.post("/", async (req, res) => {
     try{
@@ -61,6 +72,33 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
+    const { username, email, password } = req.body;
+
+    // Check for existing users
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) {
+        return res.status(400).send('Username or email already exists.');
+    }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const data = {
+        username,
+        email,
+        password: hashedPassword,
+        projects: [] // Start with an empty projects array
+    };
+
+    try {
+        const userData = await User.create(data);
+        res.status(201).send('User registered successfully');
+    } catch (error) {
+        console.error("Error registering user:", error);
+        res.status(400).send('Error registering user: ' + error.message);
+    }
+
+    /*
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
 
@@ -73,8 +111,9 @@ app.post("/register", async (req, res) => {
 
     try {
         const userData = await User.create(data); 
-        console.log(userData);
-        res.status(201).send('User registered successfully');
+        console.log("registered succesfully");
+        res.render("login");
+        // res.status(201).send('User registered successfully');
     } catch (error) {
         if (error.code === 11000) {
             res.status(400).send('Username or email already exists.');
@@ -83,6 +122,7 @@ app.post("/register", async (req, res) => {
             res.status(400).send('Error registering user: ' + error.message);
         }
     }
+    */
 });
 
 // Ruta 
@@ -90,12 +130,9 @@ app.get('/changepwd', (req, res) => {
     res.render("changepwd");
 });
 
-
 // Cambiar contraseña
 app.put("/changepwd", async (req, res) => {
     try {
-        
-
         // Buscar al usuario por el nombre de usuario
         const user = await User.findOne({ username: req.body.username });
         if (!user) {
@@ -188,7 +225,6 @@ app.put("/delete", async (req, res) => {
 //agregar proyecto (FEO)
 app.put("/proyecto", async (req, res) => {
     const { userId, proyecto } = req.body; // Asegúrate de que el cuerpo tenga esta estructura
-    
     try {
         const updatedUser = await User.findByIdAndUpdate(
             userId,
@@ -207,7 +243,7 @@ app.get("/proyects", (req, res) => {
 });
 
 app.get("/createprojects", (req, res) => {
-    //const userId = req.session.user;
+    const userId = req.session.user;
     res.render("createprojects",{userId});
 });
 
