@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Delete User</title>
+    <title>Change User</title>
 </head>
 <body>
 
-    <h1>Delete User</h1>
+    <h1>Change User</h1>
 
     <form id="changeUserForm">
         <input type="text" name="oldUsername" placeholder="Old username" required>
@@ -17,10 +17,11 @@
         <button type="submit">Change</button>
     </form>
 
-    <ul>
-        <li><a href="/proyects">Return</a></li>
-    </ul>
+    <br>
 
+    <form action="/proyects" method="get" style="display: inline">
+        <button type="submit">Return</button>
+    </form>
 
     <script>
         document.getElementById("changeUserForm").addEventListener("submit", async (event) => {

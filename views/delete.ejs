@@ -16,18 +16,20 @@
         <button type="submit">Delete</button>
     </form>
 
-    <ul>
-        <li><a href="/">Return</a></li>
-    </ul>
+    <br>
+
+    <form action="/proyects" method="get" style="display: inline;">
+        <button type="submit">Cancel</button>
+    </form>
 
 
     <script>
         document.getElementById("deleteForm").addEventListener("submit", async (event) => {
             event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
-
+    
             const formData = new FormData(event.target);
             const data = Object.fromEntries(formData);
-
+    
             try {
                 const response = await fetch("/delete", {
                     method: "PUT",
@@ -36,15 +38,22 @@
                     },
                     body: JSON.stringify(data)
                 });
-
-                const message = await response.text();
-                alert(message);
+    
+                if (response.ok) {
+                    const message = await response.json();
+                    alert(message.message); // Mostrar el mensaje de éxito
+                    window.location.href = "/"; // Redirigir al login
+                } else {
+                    const errorMessage = await response.text();
+                    alert(errorMessage); // Mostrar mensaje de error
+                }
             } catch (error) {
                 console.error("Error:", error);
-                alert("Error deleting username");
+                alert("Error deleting user");
             }
         });
-    </script>    
+    </script>
+      
     
 </body>
 </html>

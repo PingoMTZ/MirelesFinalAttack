@@ -32,8 +32,14 @@ app.set('view engine', 'ejs');
 
 
 app.get("/", (req, res) => {
-    res.render("login");
+    const message = req.session.message;
+    
+    // Clear the session message after displaying it
+    req.session.message = null;
+    
+    res.render("login", { message });
 });
+
 
 // CHANGES HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 app.get("/logout", (req, res) => {
@@ -92,39 +98,19 @@ app.post("/register", async (req, res) => {
     };
 
     try {
-        const userData = await User.create(data);
-        res.status(201).send('User registered successfully');
+        await User.create(data);
+        
+        // Set a success message in the session
+        req.session.message = "User registered successfully";
+        
+        // Redirect to login
+        res.redirect("/");
     } catch (error) {
         console.error("Error registering user:", error);
         res.status(400).send('Error registering user: ' + error.message);
     }
-
-    /*
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
-
-    const data = {
-        username: req.body.username,
-        email: req.body.email,
-        password: hashedPassword,
-        project: []
-    };
-
-    try {
-        const userData = await User.create(data); 
-        console.log("registered succesfully");
-        res.render("login");
-        // res.status(201).send('User registered successfully');
-    } catch (error) {
-        if (error.code === 11000) {
-            res.status(400).send('Username or email already exists.');
-        } else {
-            console.error("Error registering user:", error);
-            res.status(400).send('Error registering user: ' + error.message);
-        }
-    }
-    */
 });
+
 
 // Ruta 
 app.get('/changepwd', (req, res) => {
@@ -199,29 +185,34 @@ app.get("/delete", (req, res) => {
 // Borrar usuario
 app.put("/delete", async (req, res) => {
     try {
-        
-
-        // Buscar al usuario por el nombre de usuario
         const user = await User.findOne({ username: req.body.username });
         if (!user) {
             return res.status(404).send("User not found");
         }
 
-        // Verifica la contraseña 
         const passwordMatch = await bcrypt.compare(req.body.password, user.password);
         if (!passwordMatch) {
             return res.status(400).send("Password is incorrect");
         }
 
-        // Actualizar la contraseña usando findByIdAndUpdate
-        await User.deleteOne(user._id);
+        // Eliminar el usuario de la base de datos
+        await User.deleteOne({ _id: user._id });
 
-        res.send("Username deleted successfully");
+        // Destruir la sesión
+        req.session.destroy((err) => {
+            if (err) {
+                console.error("Error logging out:", err);
+                return res.status(500).send("Error logging out. Please try again.");
+            }
+            // Redirigir a la página de login
+            res.status(200).json({ message: "User deleted successfully" });
+        });
     } catch (error) {
-        console.error("Error deleting username:", error);
-        res.status(500).send("Error deleting username");
+        console.error("Error deleting user:", error);
+        res.status(500).send("Error deleting user");
     }
 });
+
 
 //agregar proyecto (FEO)
 app.put("/proyecto", async (req, res) => {

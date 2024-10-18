@@ -5,22 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Login</title>
-</head> <!-- Closing the head tag -->
+</head>
 <body>
 
-    <h1>Log In Jora</h1>
+    <h1>Login</h1>
+
+    <% if (message) { %>
+        <p style="color: green;"><%= message %></p>
+    <% } %>
 
     <form action="/" method="POST">
         <input type="text" name="username" placeholder="Username" required>
         <input type="password" name="password" placeholder="Password" required>
         <button type="submit">Login</button>
     </form>
+
+    <br>
+
+    <form action="/register" method="get" style="display: inline;">
+        <button type="submit">Register</button>
+    </form>
+
+    <br>
+    <br>
+
+    <form action="/changepwd" method="get" style="display: inline;">
+        <button type="submit">Change Password</button>
+    </form>
     
-    <ul>
-        <li><a href="/register">Register</a></li>
-        <li><a href="/changepwd">Change</a></li>
-        <li><a href="/delete">Delete</a></li>
-    </ul> <!-- Wrapped the link in a list -->
 
 </body>
 </html>

@@ -15,11 +15,18 @@
         .card {
             padding: 20px;
         }
-        .btn-delete {
+        .btn-custom {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .btn-custom:hover {
+            background-color: #0b5ed7;
+        }
+        .btn-cancel {
             background-color: #dc3545;
             color: white;
-         }
-        .btn-delete:hover {
+        }
+        .btn-cancel:hover {
             background-color: #c82333;
         }
     </style>
@@ -46,54 +53,51 @@
                     <input type="date" class="form-control" id="fechaFin" required>
                 </div>
                 <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-primary">Guardar Proyecto</button>
+                    <button type="submit" class="btn btn-custom">Guardar Proyecto</button>
+                    <a href="/proyects" class="btn btn-cancel">Cancelar</a>
                 </div>
-            </form>
-            <!--<button type="submit" class="btn btn-delete">Cancelar</button>-->
-            <form action="/proyects" method="get" style="display: inline;">
-                <button type="submit">Cancelar</button>
             </form>
         </div>
     </div>
 
     <script>
         document.getElementById('formCrearProyecto').addEventListener('submit', async function(event) {
-    event.preventDefault();
-    
-    const userId = '<%= userId %>'; 
-    const nombreProyecto = document.getElementById('nombreProyecto').value;
-    const descripcionProyecto = document.getElementById('descripcionProyecto').value;
-    const fechaInicio = document.getElementById('fechaInicio').value;
-    const fechaFin = document.getElementById('fechaFin').value;
+            event.preventDefault();
+            
+            const userId = '<%= userId %>'; 
+            const nombreProyecto = document.getElementById('nombreProyecto').value;
+            const descripcionProyecto = document.getElementById('descripcionProyecto').value;
+            const fechaInicio = document.getElementById('fechaInicio').value;
+            const fechaFin = document.getElementById('fechaFin').value;
 
-    const proyecto = {
-        name: nombreProyecto,
-        description: descripcionProyecto,
-        startDate: fechaInicio,
-        endDate: fechaFin
-    };
+            const proyecto = {
+                name: nombreProyecto,
+                description: descripcionProyecto,
+                startDate: fechaInicio,
+                endDate: fechaFin
+            };
 
-    try {
-        const response = await fetch('/proyecto', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId, proyecto })
+            try {
+                const response = await fetch('/proyecto', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userId, proyecto })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message);
+                    window.location.reload(); // Recargar la página
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                console.error('Error adding project:', error);
+                alert('Error al guardar el proyecto. Intenta de nuevo más tarde.');
+            }
         });
-
-        const result = await response.json();
-        if (response.ok) {
-            alert(result.message);
-            window.location.reload(); // Recargar la página
-        } else {
-            alert(result.message);
-        }
-    } catch (error) {
-        console.error('Error adding project:', error);
-        alert('Error al guardar el proyecto. Intenta de nuevo más tarde.');
-    }
-});
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
