@@ -202,10 +202,13 @@ app.put("/proyecto", async (req, res) => {
     }
 });
 
-
-
 app.get("/proyects", (req, res) => {
     res.render("proyects");
+});
+
+app.get("/createprojects", (req, res) => {
+    //const userId = req.session.user;
+    res.render("createprojects",{userId});
 });
 
 const port = process.env.PORT || 5001;
