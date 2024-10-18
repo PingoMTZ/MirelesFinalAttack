@@ -5,28 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Proyects</title>
-</head> <!-- Closing the head tag -->
+</head> 
 <body>
 
-    <h1>Hi</h1>
+    <h1>Your Projects</h1>
 
-    <!--- CHANGES HERES   --->
+    <ul>
+        <% if (Array.isArray(projects) && projects.length > 0) { %>
+            <% projects.forEach(project => { %>
+                <li>
+                    <h3><a href="/project/<%= project._id %>"><%= project.name %></a></h3>
+                    <p><%= project.description ? project.description : ' ' %></p>
+                    <p>Start Date: <%= project.startDate.toLocaleDateString() %></p>
+                    <p>End Date: <%= project.endDate.toLocaleDateString() %></p>
+                    
+                    <!-- Botón para eliminar proyecto -->
+                    <form action="/deleteProject" method="POST" style="display: inline;">
+                        <input type="hidden" name="userId" value="<%= userId %>">
+                        <input type="hidden" name="projectId" value="<%= project._id %>">
+                        <button type="submit">Delete</button>
+                    </form>
+                </li>
+            <% }) %>
+        <% } else { %>
+            <li>No projects available</li>
+        <% } %>        
+    </ul>
+    
+
+    <!-- Buttons -->
     <form action="/logout" method="get" style="display: inline;">
-        <button type="submit">
-            Log out
-        </button>
+        <button type="submit">Log out</button>
     </form>
     
     <form action="/changeuser" method="get" style="display: inline;">
-        <button type="submit">
-            Change username
-        </button>
+        <button type="submit">Change username</button>
     </form>
 
     <form action="/createprojects" method="get" style="display: inline;">
-        <input type="hidden" name="userId" value="<%= userId %>"> 
+        <input type="hidden" name="userId" value="<%= userId %>">
         <button type="submit">Create project</button>
     </form>
-    
+
 </body>
 </html>

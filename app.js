@@ -55,10 +55,11 @@ app.post("/", async (req, res) => {
         }
         
         const passwordMatch = await bcrypt.compare(req.body.password, user.password);
-        if(passwordMatch){
-            req.session.user = user._id;
+        if (passwordMatch) {
+            req.session.user = user._id; // Asegura que el ID del usuario esté correctamente guardado en la sesión
             const userId = req.session.user;
-            res.render("proyects",{userId});
+            const projects = user.project || []; // Obtener los proyectos del usuario
+            res.render("proyects", { userId, projects });
         }else{
             res.send("wrong data input");
         }
@@ -238,13 +239,71 @@ app.put("/proyecto", async (req, res) => {
     }
 });
 
-app.get("/proyects", (req, res) => {
-    res.render("proyects");
+app.get("/proyects", async (req, res) => {
+    try {
+        const userId = req.session.user; // Obtén el ID del usuario desde la sesión
+        const user = await User.findById(userId); // Obtener el usuario por su ID
+
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+
+        const projects = user.project || []; // Asegurarse de que haya proyectos, si no, usar un array vacío
+
+        // Pasar 'projects' como se espera en el archivo EJS
+        res.render("proyects", { userId, projects });
+    } catch (error) {
+        console.error("Error fetching projects:", error);
+        res.status(500).send("Error fetching projects.");
+    }
 });
 
 app.get("/createprojects", (req, res) => {
     const userId = req.session.user;
     res.render("createprojects",{userId});
+});
+
+// Ruta para eliminar un proyecto
+app.post("/deleteProject", async (req, res) => {
+    const { userId, projectId } = req.body;
+
+    try {
+        // Buscar al usuario por ID y eliminar el proyecto específico
+        await User.findByIdAndUpdate(
+            userId,
+            { $pull: { project: { _id: projectId } } },
+            { new: true }
+        );
+
+        res.redirect("/proyects"); // Redirige de nuevo a la lista de proyectos después de eliminar
+    } catch (error) {
+        console.error("Error deleting project:", error);
+        res.status(500).send("Error deleting project. Please try again.");
+    }
+});
+
+app.get("/project/:projectId", async (req, res) => {
+    const userId = req.session.user; // Obtener el ID del usuario desde la sesión
+    const { projectId } = req.params;
+
+    try {
+        const user = await User.findById(userId); // Obtener el usuario por su ID
+
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+
+        const project = user.project.find(p => p._id.toString() === projectId); // Buscar el proyecto por ID
+
+        if (!project) {
+            return res.status(404).send("Project not found");
+        }
+
+        res.render("tasks", { project }); // Renderizar la vista de tareas
+    } catch (error) {
+        console.error("Error fetching project tasks:", error);
+        res.status(500).send("Error fetching project tasks.");
+    }
 });
 
 const port = process.env.PORT || 5001;
