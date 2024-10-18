@@ -15,6 +15,13 @@
         .card {
             padding: 20px;
         }
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+         }
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -41,6 +48,10 @@
                 <div class="d-flex justify-content-between">
                     <button type="submit" class="btn btn-primary">Guardar Proyecto</button>
                 </div>
+            </form>
+            <!--<button type="submit" class="btn btn-delete">Cancelar</button>-->
+            <form action="/proyects" method="get" style="display: inline;">
+                <button type="submit">Cancelar</button>
             </form>
         </div>
     </div>
