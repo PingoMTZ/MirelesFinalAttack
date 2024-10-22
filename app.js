@@ -40,8 +40,6 @@ app.get("/", (req, res) => {
     res.render("login", { message });
 });
 
-
-// CHANGES HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 app.get("/logout", (req, res) => {
     // Destroy the session to log the user out
     req.session.destroy((err) => {
@@ -253,16 +251,6 @@ app.get("/createprojects", (req, res) => {
     const userId = req.session.user;
     res.render("createprojects",{userId});
 });
-
-/*app.get("/createprojects_redirect", async (req, res) => {
-    const userId = req.session.user; // Obtén el ID del usuario desde la sesión
-    const user = await User.findById(userId); // Obtener el usuario por su ID
-
-    const projects = user.project || []; // Asegurarse de que haya proyectos, si no, usar un array vacío
-
-    // Pasar 'projects' como se espera en el archivo EJS
-    res.render("proyects", { userId, projects });
-});*/
 
 // Ruta para eliminar un proyecto
 app.post("/deleteProject", async (req, res) => {
