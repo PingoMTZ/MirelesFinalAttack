@@ -214,11 +214,22 @@ app.put("/delete", async (req, res) => {
 
 //agregar proyecto (FEO)
 app.put("/proyecto", async (req, res) => {
-    const { userId, proyecto } = req.body; // Asegúrate de que el cuerpo tenga esta estructura
+    const { userId, proyecto } = req.body;
+
+    // Convertir las fechas a UTC y eliminar la hora
+    const startDate = new Date(proyecto.startDate).toISOString().split('T')[0];
+    const endDate = new Date(proyecto.endDate).toISOString().split('T')[0];
+
+    const formattedProject = {
+        ...proyecto,
+        startDate: new Date(startDate), // Fecha sin hora
+        endDate: new Date(endDate)      // Fecha sin hora
+    };
+
     try {
         const updatedUser = await User.findByIdAndUpdate(
             userId,
-            { $push: { project: proyecto } },
+            { $push: { project: formattedProject } },
             { new: true }
         );
         res.status(200).json({ message: 'Proyecto guardado con éxito', user: updatedUser });
@@ -227,6 +238,8 @@ app.put("/proyecto", async (req, res) => {
         res.status(500).json({ message: 'Error al guardar el proyecto. Intenta de nuevo más tarde.' });
     }
 });
+
+
 
 app.get("/proyects", async (req, res) => {
     try {

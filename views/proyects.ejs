@@ -16,8 +16,10 @@
                 <li>
                     <h3><a href="/project/<%= project._id %>"><%= project.name %></a></h3>
                     <p><%= project.description ? project.description : ' ' %></p>
-                    <p>Start Date: <%= project.startDate.toLocaleDateString() %></p>
-                    <p>End Date: <%= project.endDate.toLocaleDateString() %></p>
+                    <p>Start Date: <%= new Date(project.startDate).toISOString().split('T')[0] %></p>
+                    <p>End Date: <%= new Date(project.endDate).toISOString().split('T')[0] %></p>
+
+
                     
                     <!-- Botón para eliminar proyecto -->
                     <form action="/deleteProject" method="POST" style="display: inline;">

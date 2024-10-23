@@ -61,43 +61,44 @@
     </div>
 
     <script>
-        document.getElementById('formCrearProyecto').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            
-            const userId = '<%= userId %>'; 
-            const nombreProyecto = document.getElementById('nombreProyecto').value;
-            const descripcionProyecto = document.getElementById('descripcionProyecto').value;
-            const fechaInicio = document.getElementById('fechaInicio').value;
-            const fechaFin = document.getElementById('fechaFin').value;
+       document.getElementById('formCrearProyecto').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    
+    const userId = '<%= userId %>'; 
+    const nombreProyecto = document.getElementById('nombreProyecto').value;
+    const descripcionProyecto = document.getElementById('descripcionProyecto').value;
+    const fechaInicio = document.getElementById('fechaInicio').value;
+    const fechaFin = document.getElementById('fechaFin').value;
 
-            const proyecto = {
-                name: nombreProyecto,
-                description: descripcionProyecto,
-                startDate: fechaInicio,
-                endDate: fechaFin
-            };
+    const proyecto = {
+        name: nombreProyecto,
+        description: descripcionProyecto,
+        startDate: fechaInicio,
+        endDate: fechaFin
+    };
 
-            try {
-                const response = await fetch('/proyecto', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ userId, proyecto })
-                });
-
-                const result = await response.json();
-                if (response.ok) {
-                    alert(result.message);
-                    window.location.reload(); // Recargar la página
-                } else {
-                    alert(result.message);
-                }
-            } catch (error) {
-                console.error('Error adding project:', error);
-                alert('Error al guardar el proyecto. Intenta de nuevo más tarde.');
-            }
+    try {
+        const response = await fetch('/proyecto', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId, proyecto })
         });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert(result.message);
+            window.location.href = '/proyects';  // Redirigir a la lista de proyectos
+        } else {
+            alert(result.message);
+        }
+    } catch (error) {
+        console.error('Error adding project:', error);
+        alert('Error al guardar el proyecto. Intenta de nuevo más tarde.');
+    }
+});
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
