@@ -5,55 +5,94 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Delete User</title>
+    <style>
+        body {
+            background-color: #FFE4E1;
+            font-family: 'Comic Sans MS', sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #FF69B4;
+            font-size: 2.5em;
+        }
+        form {
+            display: inline-block;
+            background-color: #FFF0F5;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #FFC0CB;
+            border-radius: 12px;
+            font-size: 1em;
+            background-color: #FFF;
+        }
+        button {
+            background-color: #FFB6C1;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background-color: #FF69B4;
+        }
+        .btn-cancel {
+            background-color: #F08080;
+            color: white;
+        }
+        .btn-cancel:hover {
+            background-color: #FF6347;
+        }
+    </style>
 </head>
 <body>
 
     <h1>Delete User</h1>
 
-    <form id="deleteForm">
+    <form id="deleteUserForm">
         <input type="text" name="username" placeholder="Username" required>
         <input type="password" name="password" placeholder="Password" required>
         <button type="submit">Delete</button>
     </form>
 
-    <br>
-
-    <form action="/proyects" method="get" style="display: inline;">
-        <button type="submit">Cancel</button>
+    <form action="/" method="get" style="display: inline;">
+        <button class="btn-cancel" type="submit">Cancel</button>
     </form>
 
-
     <script>
-        document.getElementById("deleteForm").addEventListener("submit", async (event) => {
-            event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
-    
+        document.getElementById("deleteUserForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
             const formData = new FormData(event.target);
             const data = Object.fromEntries(formData);
-    
+
             try {
                 const response = await fetch("/delete", {
-                    method: "PUT",
+                    method: "DELETE",
                     headers: {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify(data)
                 });
-    
-                if (response.ok) {
-                    const message = await response.json();
-                    alert(message.message); // Mostrar el mensaje de éxito
-                    window.location.href = "/"; // Redirigir al login
-                } else {
-                    const errorMessage = await response.text();
-                    alert(errorMessage); // Mostrar mensaje de error
-                }
+
+                const message = await response.text();
+                alert(message);
             } catch (error) {
                 console.error("Error:", error);
                 alert("Error deleting user");
             }
         });
     </script>
-      
     
 </body>
 </html>

@@ -1,22 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title><%= project.name %> Tasks</title>
-</head> 
+    <title>Tareas del Proyecto</title>
+    <style>
+        body {
+            background-color: #FFF5EE;
+            font-family: 'Comic Sans MS', sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #FF69B4;
+            font-size: 2.5em;
+        }
+        .task-card {
+            background-color: #FFEBEE;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 10px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .task-card h2 {
+            color: #FF69B4;
+            font-size: 1.5em;
+        }
+        .task-card p {
+            color: #FFB6C1;
+            font-size: 1em;
+        }
+        a.btn {
+            background-color: #FFB6C1;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+            display: inline-block;
+        }
+        a.btn:hover {
+            background-color: #FF69B4;
+        }
+    </style>
+</head>
 <body>
+    <h1>Tareas del Proyecto</h1>
 
-    <h1><%= project.name %> Tasks</h1>
-    <p>No tasks</p>
-    
-    <button onclick="alert('Ni le muevas pa, está historia de usuario todavia no toca')">Create Task</button>
+    <div>
+        <% tasks.forEach(task => { %>
+            <div class="task-card">
+                <h2><%= task.name %></h2>
+                <p><%= task.description %></p>
+                <p>Fecha de entrega: <%= task.dueDate %></p>
+                <a href="/deletetask/<%= task._id %>" class="btn">Eliminar</a>
+            </div>
+        <% }) %>
+    </div>
 
-    <!-- Botones de navegación -->
-    <form action="/proyects" method="get" style="display: inline;">
-        <button type="submit">Back to Projects</button>
-    </form>
-
+    <a href="/createtask/<%= projectId %>" class="btn">Nueva Tarea</a>
 </body>
 </html>

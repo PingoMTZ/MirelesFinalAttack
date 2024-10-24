@@ -5,6 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Change User</title>
+    <style>
+        body {
+            background-color: #FFFAF0; /* Color pastel suave */
+            font-family: 'Comic Sans MS', sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #FFB6C1;
+            font-size: 2.5em;
+        }
+        form {
+            display: inline-block;
+            background-color: #FFF0F5;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #FFC0CB;
+            border-radius: 12px;
+            font-size: 1em;
+            background-color: #FFF;
+        }
+        button {
+            background-color: #FF69B4;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background-color: #FF1493;
+        }
+        .btn-return {
+            background-color: #FADADD;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
 
@@ -17,15 +63,13 @@
         <button type="submit">Change</button>
     </form>
 
-    <br>
-
-    <form action="/proyects" method="get" style="display: inline">
-        <button type="submit">Return</button>
+    <form action="/proyects" method="get" style="display: inline;">
+        <button class="btn-return" type="submit">Return</button>
     </form>
 
     <script>
         document.getElementById("changeUserForm").addEventListener("submit", async (event) => {
-            event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+            event.preventDefault();
 
             const formData = new FormData(event.target);
             const data = Object.fromEntries(formData);
@@ -46,7 +90,7 @@
                 alert("Error changing username");
             }
         });
-    </script>    
+    </script>
     
 </body>
 </html>
