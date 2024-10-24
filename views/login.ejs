@@ -6,96 +6,99 @@
     <title>Login</title>
     <style>
         body {
-            background-color: #FFF0F5;
-            font-family: 'Comic Sans MS', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .login-container {
-            background-color: #FFEBEE;
-            border-radius: 25px;
-            padding: 40px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        h1 {
-            color: #FF69B4;
-            font-size: 2.5em;
-            margin-bottom: 20px;
-        }
-        input {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: 2px solid #FFC0CB;
-            border-radius: 12px;
-            font-size: 1em;
-            background-color: #FFF;
-        }
-        button {
-            background-color: #FFB6C1;
-            color: white;
-            padding: 15px;
-            width: 100%;
-            border: none;
-            border-radius: 20px;
-            font-size: 1.2em;
-            cursor: pointer;
-            margin-top: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        button:hover {
-            background-color: #FF69B4;
-        }
-        .message {
-            color: #FF69B4;
-            margin-top: 10px;
-        }
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background-color: #fdf2f8;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+h1 {
+    color: #ff66b2;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.soft-input {
+    background-color: #fffbf7;
+    border: 1px solid #ffd6e8;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 10px 0;
+    width: 80%;
+    font-size: 1rem;
+    color: #333;
+}
+
+.soft-button {
+    background-color: #ff66b2;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.soft-button:hover {
+    background-color: #ff99cc;
+}
+
+.soft-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 2rem;
+}
+
+.note {
+    margin-top: 1rem;
+}
+
+.delete-form {
+    margin-top: 1rem;
+}
+
+.project-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+    padding: 20px;
+    text-align: left;
+}
+
+.project-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.tasks-body, .projects-body, .login-body, .register-body {
+    background-color: #fceaff;
+}
+
     </style>
 </head>
-<body>
-    <div class="login-container">
-        <h1>Login</h1>
-        <form id="loginForm">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button type="submit">Login</button>
+<body class="login-body">
+    <div class="container">
+        <h1>Welcome to Jora ^w^!</h1>
+        <form action="/" method="POST" class="soft-form">
+            <% if (message) { %>
+                <div class="message"><%= message %></div>
+            <% } %>
+            <input type="text" name="username" placeholder="Username" required class="soft-input">
+            <input type="password" name="password" placeholder="Password" required class="soft-input">
+            <button type="submit" class="soft-button">Login</button>
         </form>
-        <p class="message">¿No tienes una cuenta? <a href="/register">Regístrate</a></p>
+        <p class="note">Don't have an account? <a href="/register">Register here</a></p>
     </div>
-
-    <script>
-        document.getElementById("loginForm").addEventListener("submit", async (event) => {
-            event.preventDefault();
-
-            const formData = new FormData(event.target);
-            const data = Object.fromEntries(formData);
-
-            try {
-                const response = await fetch("/login", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                const message = await response.text();
-                if (response.ok) {
-                    window.location.href = "/proyects";
-                } else {
-                    alert(message);
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                alert("Error logging in");
-            }
-        });
-    </script>
 </body>
 </html>
