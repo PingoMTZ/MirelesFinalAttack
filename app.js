@@ -3,7 +3,7 @@ const session = require('express-session');
 const path = require("path");
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
-const User = require("./model/User")
+const User = require("./model/User");
 require('dotenv').config();
 
 const uri = process.env.DB_URI;
