@@ -3,7 +3,11 @@ const session = require('express-session');
 const path = require("path");
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
+
 const User = require("./model/User");
+const User = require("./model/Projects");
+const User = require("./model/Tasks");
+
 require('dotenv').config();
 
 const uri = process.env.DB_URI;
@@ -25,21 +29,15 @@ app.use(session({
     secret: 'your_secret_key',
     resave: false,
     saveUninitialized: true,
+    cookie: {
+        maxAge: 60000
+    }
 }));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.set('view engine', 'ejs');
 
-
-app.get("/", (req, res) => {
-    const message = req.session.message;
-    
-    // Clear the session message after displaying it
-    req.session.message = null;
-    
-    res.render("login", { message });
-});
-
+// LogOut Function
 app.get("/logout", (req, res) => {
     // Destroy the session to log the user out
     req.session.destroy((err) => {
@@ -51,6 +49,17 @@ app.get("/logout", (req, res) => {
     });
 });
 
+// Login page display
+app.get("/", (req, res) => {
+    const message = req.session.message;
+    
+    // Clear the session message after displaying it
+    req.session.message = null;
+    
+    res.render("login", { message });
+});
+
+// Login function
 app.post("/", async (req, res) => {
     try{
         const user = await User.findOne({username: req.body.username});
@@ -72,10 +81,12 @@ app.post("/", async (req, res) => {
     };
 });
 
+// Register page display
 app.get("/register", (req, res) => {
     res.render("register");
 });
 
+// Register function
 app.post("/register", async (req, res) => {
     const { username, email, password } = req.body;
 
@@ -110,12 +121,12 @@ app.post("/register", async (req, res) => {
 });
 
 
-// Ruta 
+// Change password page display
 app.get('/changepwd', (req, res) => {
     res.render("changepwd");
 });
 
-// Cambiar contraseña
+// Change password function
 app.put("/changepwd", async (req, res) => {
     try {
         // Buscar al usuario por el nombre de usuario
@@ -144,16 +155,14 @@ app.put("/changepwd", async (req, res) => {
     }
 });
 
+// Change user page display
 app.get("/changeuser", (req, res) => {
     res.render("changeuser");
 });
 
-
-// Cambiar usuario
+// Change user function
 app.put("/changeuser", async (req, res) => {
     try {
-        
-
         // Buscar al usuario por el nombre de usuario
         const user = await User.findOne({ username: req.body.oldUsername });
         if (!user) {
@@ -176,11 +185,12 @@ app.put("/changeuser", async (req, res) => {
     }
 });
 
+// Delete user page display
 app.get("/delete", (req, res) => {
     res.render("delete");
 });
 
-// Borrar usuario
+// Delete user function
 app.put("/delete", async (req, res) => {
     try {
         const user = await User.findOne({ username: req.body.username });
@@ -211,8 +221,58 @@ app.put("/delete", async (req, res) => {
     }
 });
 
+// Projects page display
+app.get("/proyects", async (req, res) => {
+    try {
+        const userId = req.session.user; // Obtén el ID del usuario desde la sesión
+        const user = await User.findById(userId); // Obtener el usuario por su ID
 
-//agregar proyecto (FEO)
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+
+        const projects = user.project || []; // Asegurarse de que haya proyectos, si no, usar un array vacío
+
+        // Pasar 'projects' como se espera en el archivo EJS
+        res.render("proyects", { userId, projects });
+    } catch (error) {
+        console.error("Error fetching projects:", error);
+        res.status(500).send("Error fetching projects.");
+    }
+});
+
+// Display projects in page function
+app.get("/project/:projectId", async (req, res) => {
+    const userId = req.session.user; // Obtener el ID del usuario desde la sesión
+    const { projectId } = req.params;
+
+    try {
+        const user = await User.findById(userId); // Obtener el usuario por su ID
+
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+
+        const project = user.project.find(p => p._id.toString() === projectId); // Buscar el proyecto por ID
+
+        if (!project) {
+            return res.status(404).send("Project not found");
+        }
+
+        res.render("tasks", { project }); // Renderizar la vista de tareas
+    } catch (error) {
+        console.error("Error fetching project tasks:", error);
+        res.status(500).send("Error fetching project tasks.");
+    }
+});
+
+// Create projects page display
+app.get("/createprojects", (req, res) => {
+    const userId = req.session.user;
+    res.render("createprojects",{userId});
+});
+
+// Create proyect function (DEPRECATED)
 app.put("/proyecto", async (req, res) => {
     const { userId, proyecto } = req.body;
 
@@ -239,33 +299,7 @@ app.put("/proyecto", async (req, res) => {
     }
 });
 
-
-
-app.get("/proyects", async (req, res) => {
-    try {
-        const userId = req.session.user; // Obtén el ID del usuario desde la sesión
-        const user = await User.findById(userId); // Obtener el usuario por su ID
-
-        if (!user) {
-            return res.status(404).send("User not found");
-        }
-
-        const projects = user.project || []; // Asegurarse de que haya proyectos, si no, usar un array vacío
-
-        // Pasar 'projects' como se espera en el archivo EJS
-        res.render("proyects", { userId, projects });
-    } catch (error) {
-        console.error("Error fetching projects:", error);
-        res.status(500).send("Error fetching projects.");
-    }
-});
-
-app.get("/createprojects", (req, res) => {
-    const userId = req.session.user;
-    res.render("createprojects",{userId});
-});
-
-// Ruta para eliminar un proyecto
+// Delete projects function
 app.post("/deleteProject", async (req, res) => {
     const { userId, projectId } = req.body;
 
@@ -284,30 +318,7 @@ app.post("/deleteProject", async (req, res) => {
     }
 });
 
-app.get("/project/:projectId", async (req, res) => {
-    const userId = req.session.user; // Obtener el ID del usuario desde la sesión
-    const { projectId } = req.params;
-
-    try {
-        const user = await User.findById(userId); // Obtener el usuario por su ID
-
-        if (!user) {
-            return res.status(404).send("User not found");
-        }
-
-        const project = user.project.find(p => p._id.toString() === projectId); // Buscar el proyecto por ID
-
-        if (!project) {
-            return res.status(404).send("Project not found");
-        }
-
-        res.render("tasks", { project }); // Renderizar la vista de tareas
-    } catch (error) {
-        console.error("Error fetching project tasks:", error);
-        res.status(500).send("Error fetching project tasks.");
-    }
-});
-
+// Star server functions
 const port = process.env.PORT || 5001;
 
 connectToDatabase().then(() => {
