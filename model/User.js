@@ -1,32 +1,10 @@
-const mongoose = require('mongoose')
-
-const ProjectSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        unique: false
-    },
-    description: {
-        type: String,
-        required: false,
-        unique: false
-    },
-    startDate: {
-        type: Date,
-        required: true
-    },
-    endDate: {
-        type: Date,
-        required: true
-    }
-    // user: {[UserSchema]} o el ID mejor
-});
+const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
-        // unique: true
+        unique: true
     },
     email: {
         type: String,
@@ -37,8 +15,14 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    project: [ProjectSchema]
-    // Si guardas un id en vez de todo el proyecto, si haces un cambio, se guarda para 
+    projects: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Project' // Reference to Project model
+    }],
+    tasks: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Task' // Reference to Task model
+    }]
 });
 
 module.exports = mongoose.model('User', UserSchema);
