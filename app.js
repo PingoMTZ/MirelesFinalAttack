@@ -285,7 +285,10 @@ app.get("/proyects", async (req, res) => {
 
     try {
         const userId = req.session.user; // Obtén el ID del usuario desde la sesión
-        const user = await User.findById(userId); // Obtener el usuario por su ID
+        // CHANGES MADE HERE, no using popoulate
+        // const user = await User.findById(userId); // Obtener el usuario por su ID
+
+        const user = await User.findById(userId).populate("projects");
 
         if (!user) {
             return res.status(404).send("User not found");
@@ -301,6 +304,7 @@ app.get("/proyects", async (req, res) => {
     }
 });
 
+/* OLD REMIL WORK THING
 // Display projects in page function
 app.get("/project/:projectId", async (req, res) => {
     const userId = req.session.user; // Obtener el ID del usuario desde la sesión
@@ -325,6 +329,24 @@ app.get("/project/:projectId", async (req, res) => {
         res.status(500).send("Error fetching project tasks.");
     }
 });
+*/
+
+app.get("/project/:projectId", async (req, res) => {
+    const { projectId } = req.params;
+
+    try {
+        const project = await Project.findById(projectId);
+
+        if (!project) {
+            return res.status(404).send("Project not found");
+        }
+
+        res.render("tasks", { project });
+    } catch (error) {
+        console.error("Error fetching project tasks:", error);
+        res.status(500).send("Error fetching project tasks.");
+    }
+});
 
 // Create projects page display
 app.get("/createprojects", (req, res) => {
@@ -332,6 +354,7 @@ app.get("/createprojects", (req, res) => {
     res.render("createprojects",{userId});
 });
 
+/* OLD PROYECTO FUNCTION
 // Create proyect function (DEPRECATED)
 app.put("/proyecto", async (req, res) => {
     const { userId, proyecto } = req.body;
@@ -358,7 +381,38 @@ app.put("/proyecto", async (req, res) => {
         res.status(500).json({ message: 'Error al guardar el proyecto. Intenta de nuevo más tarde.' });
     }
 });
+*/
 
+app.put("/proyecto", async (req, res) => {
+    const { userId, proyecto } = req.body;
+
+    const formattedProject = {
+        ...proyecto,
+        startDate: new Date(proyecto.startDate),
+        endDate: new Date(proyecto.endDate),
+        administrator: userId // Set the administrator as the current user
+    };
+
+    try {
+        // Create the project in the Project collection
+        const newProject = await Project.create(formattedProject);
+
+        // Then, push the project's ObjectId into the user's `projects` array
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $push: { projects: newProject._id } },
+            { new: true }
+        );
+
+        res.status(200).json({ message: 'Proyecto guardado con éxito', user: updatedUser });
+    } catch (error) {
+        console.error('Error adding project:', error);
+        res.status(500).json({ message: 'Error al guardar el proyecto. Intenta de nuevo más tarde.' });
+    }
+});
+
+
+/* OLD DELETE
 // Delete projects function
 app.post("/deleteProject", async (req, res) => {
     const { userId, projectId } = req.body;
@@ -377,6 +431,29 @@ app.post("/deleteProject", async (req, res) => {
         res.status(500).send("Error deleting project. Please try again.");
     }
 });
+*/
+
+app.post("/deleteProject", async (req, res) => {
+    const { userId, projectId } = req.body;
+
+    try {
+        // First, remove the project from the Project collection
+        await Project.findByIdAndDelete(projectId);
+
+        // Then, remove the project's reference from the user's projects array
+        await User.findByIdAndUpdate(
+            userId,
+            { $pull: { projects: projectId } },
+            { new: true }
+        );
+
+        res.redirect("/proyects");
+    } catch (error) {
+        console.error("Error deleting project:", error);
+        res.status(500).send("Error deleting project. Please try again.");
+    }
+});
+
 
 // Star server functions
 const port = process.env.PORT || 5001;
