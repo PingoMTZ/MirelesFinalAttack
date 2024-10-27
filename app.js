@@ -35,14 +35,26 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.set('view engine', 'ejs');
 
+function isAuthenticated(req, res, next) {
+    if (req.session.user) {
+        return next();
+    }
+    res.redirect("/"); // Redirect to login page if not logged in
+}
+
+app.use((req, res, next) => {
+    res.set("Cache-Control", "no-store"); // Prevent caching
+    next();
+});
+
 // LogOut Function
 app.get("/logout", (req, res) => {
-    // Destroy the session to log the user out
     req.session.destroy((err) => {
         if (err) {
             console.error("Error logging out:", err);
             return res.status(500).send("Error logging out. Please try again.");
         }
+        res.clearCookie("connect.sid"); // Clear session cookie
         res.redirect("/"); // Redirect to the login page after logout
     });
 });
@@ -54,30 +66,6 @@ app.get("/", (req, res) => {
     req.session.message = null;
     res.render("login", { message });
 });
-
-/* OLD LOGIN
-// Login function
-app.post("/", async (req, res) => {
-    try{
-        const user = await User.findOne({username: req.body.username});
-        if(!user){
-            return res.status(404).send("User not found");
-        }
-        
-        const passwordMatch = await bcrypt.compare(req.body.password, user.password);
-        if (passwordMatch) {
-            req.session.user = user._id; // Asegura que el ID del usuario esté correctamente guardado en la sesión
-            const userId = req.session.user;
-            const projects = user.project || []; // Obtener los proyectos del usuario
-            res.render("proyects", { userId, projects });
-        }else{
-            res.send("wrong data input");
-        }
-    }catch{
-        res.send("wrong details");
-    };
-});
-*/
 
 // New Login
 app.post("/", async (req, res) => {
@@ -106,42 +94,6 @@ app.post("/", async (req, res) => {
 app.get("/register", (req, res) => {
     res.render("register");
 });
-
-/* OLD REGISTER
-// Register function
-app.post("/register", async (req, res) => {
-    const { username, email, password } = req.body;
-
-    // Check for existing users
-    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-    if (existingUser) {
-        return res.status(400).send('Username or email already exists.');
-    }
-
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    const data = {
-        username,
-        email,
-        password: hashedPassword,
-        projects: [] // Start with an empty projects array
-    };
-
-    try {
-        await User.create(data);
-        
-        // Set a success message in the session
-        req.session.message = "User registered successfully";
-        
-        // Redirect to login
-        res.redirect("/");
-    } catch (error) {
-        console.error("Error registering user:", error);
-        res.status(400).send('Error registering user: ' + error.message);
-    }
-});
-*/
 
 app.post("/register", async (req, res) => {
     const { username, email, password } = req.body;
@@ -212,7 +164,7 @@ app.put("/changepwd", async (req, res) => {
 });
 
 // Change user page display
-app.get("/changeuser", (req, res) => {
+app.get("/changeuser", isAuthenticated, (req, res) => {
     res.render("changeuser");
 });
 
@@ -242,7 +194,7 @@ app.put("/changeuser", async (req, res) => {
 });
 
 // Delete user page display
-app.get("/delete", (req, res) => {
+app.get("/delete", isAuthenticated, (req, res) => {
     res.render("delete");
 });
 
@@ -278,11 +230,7 @@ app.put("/delete", async (req, res) => {
 });
 
 // Projects page display
-app.get("/proyects", async (req, res) => {
-    if (!req.session.user) {
-        return res.redirect("/"); // Redirect to login if not authenticated
-    }
-
+app.get("/proyects", isAuthenticated, async (req, res) => {
     try {
         const userId = req.session.user; // Obtén el ID del usuario desde la sesión
         // CHANGES MADE HERE, no using popoulate
@@ -294,7 +242,7 @@ app.get("/proyects", async (req, res) => {
             return res.status(404).send("User not found");
         }
 
-        const projects = user.project || []; // Asegurarse de que haya proyectos, si no, usar un array vacío
+        const projects = user.projects || []; // Asegurarse de que haya proyectos, si no, usar un array vacío
 
         // Pasar 'projects' como se espera en el archivo EJS
         res.render("proyects", { userId, projects });
@@ -303,33 +251,6 @@ app.get("/proyects", async (req, res) => {
         res.status(500).send("Error fetching projects.");
     }
 });
-
-/* OLD REMIL WORK THING
-// Display projects in page function
-app.get("/project/:projectId", async (req, res) => {
-    const userId = req.session.user; // Obtener el ID del usuario desde la sesión
-    const { projectId } = req.params;
-
-    try {
-        const user = await User.findById(userId); // Obtener el usuario por su ID
-
-        if (!user) {
-            return res.status(404).send("User not found");
-        }
-
-        const project = user.project.find(p => p._id.toString() === projectId); // Buscar el proyecto por ID
-
-        if (!project) {
-            return res.status(404).send("Project not found");
-        }
-
-        res.render("tasks", { project }); // Renderizar la vista de tareas
-    } catch (error) {
-        console.error("Error fetching project tasks:", error);
-        res.status(500).send("Error fetching project tasks.");
-    }
-});
-*/
 
 app.get("/project/:projectId", async (req, res) => {
     const { projectId } = req.params;
@@ -349,39 +270,10 @@ app.get("/project/:projectId", async (req, res) => {
 });
 
 // Create projects page display
-app.get("/createprojects", (req, res) => {
+app.get("/createprojects", isAuthenticated, (req, res) => {
     const userId = req.session.user;
     res.render("createprojects",{userId});
 });
-
-/* OLD PROYECTO FUNCTION
-// Create proyect function (DEPRECATED)
-app.put("/proyecto", async (req, res) => {
-    const { userId, proyecto } = req.body;
-
-    // Convertir las fechas a UTC y eliminar la hora
-    const startDate = new Date(proyecto.startDate).toISOString().split('T')[0];
-    const endDate = new Date(proyecto.endDate).toISOString().split('T')[0];
-
-    const formattedProject = {
-        ...proyecto,
-        startDate: new Date(startDate), // Fecha sin hora
-        endDate: new Date(endDate)      // Fecha sin hora
-    };
-
-    try {
-        const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            { $push: { project: formattedProject } },
-            { new: true }
-        );
-        res.status(200).json({ message: 'Proyecto guardado con éxito', user: updatedUser });
-    } catch (error) {
-        console.error('Error adding project:', error);
-        res.status(500).json({ message: 'Error al guardar el proyecto. Intenta de nuevo más tarde.' });
-    }
-});
-*/
 
 app.put("/proyecto", async (req, res) => {
     const { userId, proyecto } = req.body;
@@ -410,28 +302,6 @@ app.put("/proyecto", async (req, res) => {
         res.status(500).json({ message: 'Error al guardar el proyecto. Intenta de nuevo más tarde.' });
     }
 });
-
-
-/* OLD DELETE
-// Delete projects function
-app.post("/deleteProject", async (req, res) => {
-    const { userId, projectId } = req.body;
-
-    try {
-        // Buscar al usuario por ID y eliminar el proyecto específico
-        await User.findByIdAndUpdate(
-            userId,
-            { $pull: { project: { _id: projectId } } },
-            { new: true }
-        );
-
-        res.redirect("/proyects"); // Redirige de nuevo a la lista de proyectos después de eliminar
-    } catch (error) {
-        console.error("Error deleting project:", error);
-        res.status(500).send("Error deleting project. Please try again.");
-    }
-});
-*/
 
 app.post("/deleteProject", async (req, res) => {
     const { userId, projectId } = req.body;
