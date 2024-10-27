@@ -1,13 +1,11 @@
 const express = require('express');
 const session = require('express-session');
-const path = require("path");
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
 
 const User = require("./model/User");
-const User = require("./model/Projects");
-const User = require("./model/Tasks");
-
+const Project = require("./model/Projects");
+const Task = require("./model/Tasks");
 require('dotenv').config();
 
 const uri = process.env.DB_URI;
@@ -52,13 +50,12 @@ app.get("/logout", (req, res) => {
 // Login page display
 app.get("/", (req, res) => {
     const message = req.session.message;
-    
     // Clear the session message after displaying it
     req.session.message = null;
-    
     res.render("login", { message });
 });
 
+/* OLD LOGIN
 // Login function
 app.post("/", async (req, res) => {
     try{
@@ -80,12 +77,37 @@ app.post("/", async (req, res) => {
         res.send("wrong details");
     };
 });
+*/
+
+// New Login
+app.post("/", async (req, res) => {
+    try {
+        const user = await User.findOne({ username: req.body.username });
+        
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+
+        const passwordMatch = await bcrypt.compare(req.body.password, user.password);
+        
+        if (passwordMatch) {
+            req.session.user = user._id; // Store user ID in the session
+            res.redirect("/proyects"); // Redirect to projects page
+        } else {
+            res.send("Incorrect username or password");
+        }
+    } catch (error) {
+        console.error("Login error:", error);
+        res.status(500).send("Error during login. Please try again.");
+    }
+});
 
 // Register page display
 app.get("/register", (req, res) => {
     res.render("register");
 });
 
+/* OLD REGISTER
 // Register function
 app.post("/register", async (req, res) => {
     const { username, email, password } = req.body;
@@ -119,7 +141,41 @@ app.post("/register", async (req, res) => {
         res.status(400).send('Error registering user: ' + error.message);
     }
 });
+*/
 
+app.post("/register", async (req, res) => {
+    const { username, email, password } = req.body;
+
+    // Check for existing users
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) {
+        return res.status(400).send('Username or email already exists.');
+    }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const data = {
+        username,
+        email,
+        password: hashedPassword,
+        projects: [], // Start with an empty projects array
+        tasks: []
+    };
+
+    try {
+        await User.create(data);
+        
+        // Set a success message in the session
+        req.session.message = "User registered successfully";
+        
+        // Redirect to login
+        res.redirect("/");
+    } catch (error) {
+        console.error("Error registering user:", error);
+        res.status(400).send('Error registering user: ' + error.message);
+    }
+});
 
 // Change password page display
 app.get('/changepwd', (req, res) => {
@@ -223,6 +279,10 @@ app.put("/delete", async (req, res) => {
 
 // Projects page display
 app.get("/proyects", async (req, res) => {
+    if (!req.session.user) {
+        return res.redirect("/"); // Redirect to login if not authenticated
+    }
+
     try {
         const userId = req.session.user; // Obtén el ID del usuario desde la sesión
         const user = await User.findById(userId); // Obtener el usuario por su ID
