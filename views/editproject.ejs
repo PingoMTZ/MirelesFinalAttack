@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Project</title>
+</head>
+<body>
+
+    <h1>Edit Project</h1>
+
+    <form action="/project/edit/<%= project._id %>" method="POST">
+        <div>
+            <label for="name">Project Name:</label>
+            <input type="text" id="name" name="name" value="<%= project.name %>" required>
+        </div>
+
+        <div>
+            <label for="description">Description:</label>
+            <textarea id="description" name="description"><%= project.description %></textarea>
+        </div>
+
+        <div>
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" name="startDate" value="<%= new Date(project.startDate).toISOString().split('T')[0] %>" required>
+        </div>
+
+        <div>
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate" name="endDate" value="<%= new Date(project.endDate).toISOString().split('T')[0] %>" required>
+        </div>
+
+        <button type="submit">Save changes</button>
+    </form>
+
+    <form action="/proyects" method="get">
+        <button type="submit">Cancel</button>
+    </form>
+
+</body>
+</html>

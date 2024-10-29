@@ -19,6 +19,10 @@
                     <p>Start Date: <%= new Date(project.startDate).toISOString().split('T')[0] %></p>
                     <p>End Date: <%= new Date(project.endDate).toISOString().split('T')[0] %></p>
 
+                    <form action="/project/edit/<%= project._id %>" method="get" style="display: inline;">
+                        <button type="submit">Modify</button>
+                    </form>
+                    <br>                    
                     <!-- Botón para eliminar proyecto -->
                     <form action="/deleteProject" method="POST" style="display: inline;">
                         <input type="hidden" name="userId" value="<%= userId %>">
