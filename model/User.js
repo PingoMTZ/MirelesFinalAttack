@@ -15,6 +15,14 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    question: {
+        type: String,
+        required: true
+    },
+    answer: {
+        type: String,
+        required: true
+    },
     projects: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Project' // Reference to Project model

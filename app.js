@@ -96,7 +96,7 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, question, answer } = req.body;
 
     // Check for existing users
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
@@ -106,11 +106,14 @@ app.post("/register", async (req, res) => {
 
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const hashedAnswer = await bcrypt.hash(answer, saltRounds);
 
     const data = {
         username,
         email,
         password: hashedPassword,
+        question,
+        answer: hashedAnswer,
         projects: [], // Start with an empty projects array
         tasks: []
     };
@@ -127,6 +130,66 @@ app.post("/register", async (req, res) => {
         console.error("Error registering user:", error);
         res.status(400).send('Error registering user: ' + error.message);
     }
+});
+
+// Recover password page display
+app.get("/recoverpwd", (req, res) => {
+    res.render("recoverpwd"); // Renderiza el formulario inicial de recuperación
+});
+
+// Procesar username y email para recuperación de contraseña
+app.post("/recoverpwd", async (req, res) => {
+    const { username, email } = req.body;
+    const user = await User.findOne({ username, email });
+
+    if (!user) {
+        return res.status(404).send("User not found or email does not match.");
+    }
+
+    // Almacenar temporalmente el ID del usuario en la sesión para el siguiente paso
+    req.session.recoverUserId = user._id;
+    res.render("securityquestion", { question: user.question });
+});
+
+// Ruta para mostrar formulario de nueva contraseña tras responder correctamente la pregunta de seguridad
+app.post("/recoverpwd/verify", async (req, res) => {
+    const { answer } = req.body;
+    const userId = req.session.recoverUserId;
+
+    if (!userId) {
+        return res.status(400).send("Session expired. Please try again.");
+    }
+
+    const user = await User.findById(userId);
+    const answerMatch = await bcrypt.compare(answer, user.answer);
+
+    if (answerMatch) {
+        // Si la respuesta es correcta, redirige a un formulario para cambiar la contraseña
+        res.render("resetpassword");
+    } else {
+        res.status(400).send("Incorrect answer.");
+    }
+});
+
+// Ruta para procesar el restablecimiento de contraseña
+app.post("/resetpassword", async (req, res) => {
+    const { newPassword } = req.body;
+    const userId = req.session.recoverUserId;
+
+    if (!userId) {
+        return res.status(400).send("Session expired. Please try again.");
+    }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    // Actualiza la contraseña del usuario en la base de datos
+    await User.findByIdAndUpdate(userId, { password: hashedPassword });
+
+    // Limpia la sesión y notifica al usuario
+    req.session.recoverUserId = null;
+    req.session.message = "Your password has been successfully reset. You can now log in with your new password.";
+    res.redirect("/");
 });
 
 // Change password page display

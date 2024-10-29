@@ -1,0 +1,16 @@
+<!-- views/securityquestion.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Security Question</title>
+</head>
+<body>
+    <h1>Answer Security Question</h1>
+    <p><%= question %></p>
+    <form action="/recoverpwd/verify" method="POST">
+        <input type="text" name="answer" placeholder="Answer" required>
+        <button type="submit">Recover</button>
+    </form>
+</body>
+</html>
