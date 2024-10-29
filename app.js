@@ -366,6 +366,45 @@ app.put("/proyecto", async (req, res) => {
     }
 });
 
+// Ruta para mostrar la página de edición de proyecto
+app.get("/project/edit/:projectId", isAuthenticated, async (req, res) => {
+    const { projectId } = req.params;
+
+    try {
+        const project = await Project.findById(projectId);
+        
+        if (!project) {
+            return res.status(404).send("Project not found");
+        }
+
+        res.render("editproject", { project });
+    } catch (error) {
+        console.error("Error fetching project for edit:", error);
+        res.status(500).send("Error fetching project. Please try again.");
+    }
+});
+
+// Ruta para actualizar los datos del proyecto
+app.post("/project/edit/:projectId", isAuthenticated, async (req, res) => {
+    const { projectId } = req.params;
+    const { name, description, startDate, endDate } = req.body;
+
+    try {
+        await Project.findByIdAndUpdate(projectId, {
+            name,
+            description,
+            startDate: new Date(startDate),
+            endDate: new Date(endDate)
+        });
+
+        res.redirect("/proyects"); // Redirige a la lista de proyectos tras guardar
+    } catch (error) {
+        console.error("Error updating project:", error);
+        res.status(500).send("Error updating project. Please try again.");
+    }
+});
+
+
 app.post("/deleteProject", async (req, res) => {
     const { userId, projectId } = req.body;
 
