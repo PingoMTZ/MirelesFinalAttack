@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Proyects</title>
+    <title>Projects</title>
 </head> 
 <body>
 
@@ -22,13 +22,16 @@
                     <form action="/project/edit/<%= project._id %>" method="get" style="display: inline;">
                         <button type="submit">Modify</button>
                     </form>
-                    <br>                    
-                    <!-- Botón para eliminar proyecto -->
-                    <form action="/deleteProject" method="POST" style="display: inline;">
-                        <input type="hidden" name="userId" value="<%= userId %>">
-                        <input type="hidden" name="projectId" value="<%= project._id %>">
-                        <button type="submit">Delete</button>
-                    </form>
+                    <br>
+                    
+                    <!-- Show Delete button only if user is the administrator -->
+                    <% if (project.administrator.toString() === userId.toString()) { %>
+                        <form action="/deleteProject" method="POST" style="display: inline;">
+                            <input type="hidden" name="userId" value="<%= userId %>">
+                            <input type="hidden" name="projectId" value="<%= project._id %>">
+                            <button type="submit">Delete</button>
+                        </form>
+                    <% } %>
                 </li>
             <% }) %>
         <% } else { %>
@@ -36,7 +39,6 @@
         <% } %>        
     </ul>
     
-
     <!-- Buttons -->
     <form action="/logout" method="get" style="display: inline;">
         <button type="submit">Log out</button>
