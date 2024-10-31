@@ -426,6 +426,101 @@ app.post("/deleteProject", async (req, res) => {
     }
 });
 
+app.post("/tasks", async (req, res) => {
+    const { projectId, taskTitle, taskDescription, priority, startDate, endDate, timeEstimation, comments, assigneeName } = req.body;
+    
+    try {
+        // Checks if the user is in the database
+        const user = await User.findOne({ username: assigneeName });
+        if (!user) {
+            return res.status(404).send("Username not found");
+        }
+
+        // Creates a new task
+        const newTask = new Task({
+            name: taskTitle,
+            description: taskDescription,
+            priority,
+            startDate: new Date(startDate),
+            endDate: new Date(endDate),
+            timeEstimation,
+            comments,
+            users: [user._id],
+            project: projectId
+        });
+
+        await newTask.save();
+
+        // Adds the task ID to the project task array
+        await Project.findByIdAndUpdate(projectId, { $push: { tasks: newTask._id } });
+
+        // Redirect or responds with a success message
+        res.redirect(`/project/${projectId}`);
+    } catch (error) {
+        console.error("Error creating task:", error);
+        res.status(500).send("Error creating task. Please try again.");
+    }
+});
+
+
+app.get("/createTask/:projectId", isAuthenticated, async (req, res) => {
+    const { projectId } = req.params;
+
+    try {
+        const project = await Project.findById(projectId);
+
+        if(!project) {
+            return res.status(404).send("Project was not found");
+        }
+
+        res.render("createTask", { project }); // Passes the project to createTask.ejs
+    } catch (error) {
+        console.error("Error fetching project:", error);
+        res.status(500).send("Error fetching project.");
+    }
+});
+
+app.get("/addMember/:projectId", isAuthenticated, async (req, res) => {
+    const { projectId } = req.params;
+
+    try {
+        const project = await Project.findById(projectId).populate('members');
+        
+        if (!project) {
+            return res.status(404).send("Project not found");
+        }
+
+        const projectMemberIds = project.members.map(member => member._id);
+        const availableUser = await User.find({ _id: {  $nin: projectMemberIds } });
+
+        res.render("addMember", { projectId, availableUser });
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        res.status(500).send("Error fetching users");
+    }
+});
+
+app.post("/addMember", isAuthenticated, async (req, res) => {
+    const { projectId, userId } = req.body;
+
+    try {
+        const project = await Project.findById(projectId);
+
+        if (!project) {
+            return res.status(404).send("Project not found");
+        }
+
+        await Project.findByIdAndUpdate(projectId, { $addToSet: { members: userId } });
+
+        await User.findByIdAndUpdate(userId, { $addToSet: { projects: projectId } });
+
+        res.redirect('/proyects');
+
+    } catch (error) {
+        console.error("Error adding member:", error);
+        res.status(500).send("Error adding member. Please try again.");
+    }
+});
 
 // Star server functions
 const port = process.env.PORT || 5001;

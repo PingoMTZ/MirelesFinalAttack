@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Add Member to Project</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Add Member to Project</h2>
+        <form id="addMemberForm" action="/addMember" method="POST">
+            <input type="hidden" name="projectId" value="<%= projectId %>">
+            <div class="form-group">
+                <label for="member">Select an user</label>
+                <select class="form-control" id="member" name="userId" required>
+                    <% availableUser.forEach(function(user) { %>
+                    <option value="<%= user._id %>"><%= user.username %> - <%= user.email %></option>
+                <% }); %>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Member</button>
+            <a href="/project/<%= projectId %>" class="btn btn-secondary">Cancel</a>
+        </form>
+        <script>
+            document.getElementById("addMemberForm").addEventListener("submit", function(event) {
+                event.preventDefault();
+                fetch('/addMember', {
+                    method: 'POST',
+                    body: new URLSearchParams(new FormData(this))
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.href = "/proyects"; // Redirects to the projects page
+                    } else {
+                        alert("Failed to add member. Please try again.");
+                    }
+                }).catch(error => console.error('Error:', error));
+            });
+        </script>
+    
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

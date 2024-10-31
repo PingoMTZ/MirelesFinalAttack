@@ -28,6 +28,10 @@ const ProjectSchema = new mongoose.Schema({
     tasks: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Task' // Reference to Task model
+    }],
+    members:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }]
 });
 

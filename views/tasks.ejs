@@ -8,14 +8,17 @@
 </head> 
 <body>
 
-    <h1><%= project.name %> Tasks</h1>
-    <p>No tasks</p>
     
-    <button onclick="alert('Ni le muevas pa, está historia de usuario todavia no toca')">Create Task</button>
 
     <!-- Botones de navegación -->
     <form action="/proyects" method="get" style="display: inline;">
         <button type="submit">Back to Projects</button>
+    </form>
+    <form action="/createTask/<%= project._id %>" method="get" style="display: inline;">
+        <button type="submit">Create Task</button>
+    </form>
+    <form action="/addMember/<%= project._id %>" method="get" style="display: inline;">
+        <button type="submit">Add member</button>
     </form>
 
 </body>
