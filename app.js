@@ -28,7 +28,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        maxAge: 60000
+        maxAge: 600000
     }
 }));
 app.use(express.json());
@@ -274,7 +274,29 @@ app.put("/delete", async (req, res) => {
             return res.status(400).send("Password is incorrect");
         }
 
-        // Eliminar el usuario de la base de datos
+       // Step 1: Find projects where the user is the administrator
+       const adminProjects = await Project.find({ administrator: user._id });
+
+       // Step 2: Collect task IDs from these projects
+       const taskIdsToDelete = [];
+       for (const project of adminProjects) {
+           taskIdsToDelete.push(...project.tasks); // Collect tasks from projects
+       }
+       
+       // Step 3: Delete the tasks
+       await Task.deleteMany({ _id: { $in: taskIdsToDelete } });
+
+       // Step 4: Delete the projects
+       await Project.deleteMany({ administrator: user._id });
+
+        // Step 2: Remove user from projects where they are a member
+        await Project.updateMany(
+            { members: user._id },
+            { $pull: { members: user._id } }
+        );
+
+        
+        // Step 3: Delete the user
         await User.deleteOne({ _id: user._id });
 
         // Destruir la sesión
@@ -407,25 +429,122 @@ app.post("/project/edit/:projectId", isAuthenticated, async (req, res) => {
 
 app.post("/deleteProject", async (req, res) => {
     const { userId, projectId } = req.body;
-
     try {
+        const project = await Project.findById(projectId);
         // First, remove the project from the Project collection
         await Project.findByIdAndDelete(projectId);
 
-        // Then, remove the project's reference from the user's projects array
         await User.findByIdAndUpdate(
             userId,
             { $pull: { projects: projectId } },
-            { new: true }
+            { new: true } 
         );
+
+        await User.updateMany(
+            { _id: { $in: project.members } }, 
+            { $pull: { projects: projectId } }
+        );    
+
+        // Remove all tasks associated with this project
+        await Task.deleteMany({ _id: { $in: project.tasks } });        
 
         res.redirect("/proyects");
     } catch (error) {
         console.error("Error deleting project:", error);
         res.status(500).send("Error deleting project. Please try again.");
     }
+    
 });
 
+app.post("/tasks", async (req, res) => {
+    const { projectId, taskTitle, taskDescription, priority, startDate, endDate, timeEstimation, comments, assigneeName } = req.body;
+    
+    try {
+        // Creates a new task
+        const newTask = new Task({
+            name: taskTitle,
+            description: taskDescription,
+            priority,
+            startDate: new Date(startDate),
+            endDate: new Date(endDate),
+            timeEstimation,
+            comments,
+            users: [],
+            project: projectId
+        });
+
+        await newTask.save();
+
+        // Adds the task ID to the project task array
+        await Project.findByIdAndUpdate(projectId, { $push: { tasks: newTask._id } });
+
+        // Redirect or responds with a success message
+        res.redirect(`/project/${projectId}`);
+    } catch (error) {
+        console.error("Error creating task:", error);
+        res.status(500).send("Error creating task. Please try again.");
+    }
+});
+
+
+app.get("/createTask/:projectId", isAuthenticated, async (req, res) => {
+    const { projectId } = req.params;
+
+    try {
+        const project = await Project.findById(projectId);
+
+        if(!project) {
+            return res.status(404).send("Project was not found");
+        }
+
+        res.render("createTask", { project }); // Passes the project to createTask.ejs
+    } catch (error) {
+        console.error("Error fetching project:", error);
+        res.status(500).send("Error fetching project.");
+    }
+});
+
+app.get("/addMember/:projectId", isAuthenticated, async (req, res) => {
+    const { projectId } = req.params;
+
+    try {
+        const project = await Project.findById(projectId).populate('members');
+        
+        if (!project) {
+            return res.status(404).send("Project not found");
+        }
+
+        const projectMemberIds = project.members.map(member => member._id);
+        const availableUser = await User.find({ _id: {  $nin: projectMemberIds } });
+
+        res.render("addMember", { projectId, availableUser });
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        res.status(500).send("Error fetching users");
+    }
+});
+
+app.post("/addMember", isAuthenticated, async (req, res) => {
+    const { projectId, userId } = req.body;
+
+    try {
+        const project = await Project.findById(projectId);
+
+        if (!project) {
+            return res.status(404).send("Project not found");
+        }
+
+        await Project.findByIdAndUpdate(projectId, { $addToSet: { members: userId } });
+
+        await User.findByIdAndUpdate(userId, { $addToSet: { projects: projectId } });
+
+        res.redirect('/proyects');
+
+    } catch (error) {
+        console.error("Error adding member:", error);
+        res.status(500).send("Error adding member. Please try again.");
+    }
+});
 
 // Star server functions
 const port = process.env.PORT || 5001;

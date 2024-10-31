@@ -21,13 +21,13 @@ const ProjectSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User' // Reference to User model
     },
-    users: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User' // Reference to User model
-    }],
     tasks: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Task' // Reference to Task model
+    }],
+    members:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }]
 });
 
