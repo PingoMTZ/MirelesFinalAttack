@@ -337,17 +337,20 @@ app.get("/proyects", isAuthenticated, async (req, res) => {
     }
 });
 
+// Changes made here
 app.get("/project/:projectId", async (req, res) => {
     const { projectId } = req.params;
 
     try {
-        const project = await Project.findById(projectId);
+        const project = await Project.findById(projectId).populate("tasks");
 
         if (!project) {
             return res.status(404).send("Project not found");
         }
 
-        res.render("tasks", { project });
+        const userId = req.session.user; 
+
+        res.render("tasks", { project, tasks: project.tasks, userId });
     } catch (error) {
         console.error("Error fetching project tasks:", error);
         res.status(500).send("Error fetching project tasks.");
@@ -545,6 +548,117 @@ app.post("/addMember", isAuthenticated, async (req, res) => {
         res.status(500).send("Error adding member. Please try again.");
     }
 });
+
+// Funciones para los nuevos botones en el view de task
+
+app.get("/task/edit/:taskId", isAuthenticated, async (req, res) => {
+    const { taskId } = req.params; // Retrieve taskId from the URL
+    const { projectId } = req.query; // Retrieve projectId from query parameters
+
+    try {
+        const task = await Task.findById(taskId);
+        const project = await Project.findById(projectId);
+
+        if (!task) {
+            return res.status(404).send("Task was not found");
+        }
+
+        if (!project) {
+            return res.status(404).send("Project was not found");
+        }
+
+        res.render("editTask", { task, project }); // Pass the task and projectId to the view
+    } catch (error) {
+        console.error("Error fetching task:", error);
+        res.status(500).send("Error fetching task.");
+    }
+});
+
+// Aqui va el app.post para edit task
+
+app.post("/task/delete/:taskId", isAuthenticated, async (req, res) => {
+    const { taskId } = req.params; // Retrieve taskId from the URL
+    const { projectId } = req.body; // Retrieve projectId from body
+
+    try {
+        // Find the task to ensure it exists
+        const task = await Task.findById(taskId);
+        if (!task) {
+            return res.status(404).send("Task not found");
+        }
+
+        // Update the project by removing the task reference
+        await Project.findByIdAndUpdate(projectId, { $pull: { tasks: taskId } });
+
+        // Update users by removing the task reference from their tasks array
+        await User.updateMany(
+            { _id: { $in: task.users } }, // Find all users assigned to this task
+            { $pull: { tasks: taskId } }   // Remove the task from their tasks array
+        );
+
+        // Delete the task from the database
+        await Task.findByIdAndDelete(taskId);
+
+        // Redirect to the project tasks view or send a success message
+        res.redirect(`/project/${projectId}`);
+    } catch (error) {
+        console.error("Error deleting task:", error);
+        res.status(500).send("Error while deleting task. Please try again.");
+    }
+});
+
+
+app.get("/task/addMember/:taskId", isAuthenticated, async (req, res) => {
+    const { taskId } = req.params; // Retrieve taskId from the URL
+    const { projectId } = req.query; // Retrieve projectId from query parameters
+
+    try {
+        const task = await Task.findById(taskId);
+        const project = await Project.findById(projectId);
+
+        if (!task) {
+            return res.status(404).send("Task was not found");
+        }
+
+        if (!project) {
+            return res.status(404).send("Project was not found");
+        }
+
+        res.render("addTaskMember", { task, project }); // Pass the task and projectId to the view
+    } catch (error) {
+        console.error("Error fetching task or project:", error);
+        res.status(500).send("Error fetching task or project.");
+    }
+});
+
+app.post("/addTaskMember/:taskId", isAuthenticated, async (req, res) => {
+    try {
+        const user = await User.findOne({ username: req.body.member });
+        
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+
+        const { taskId } = req.params;
+        const userId = user._id; // Directly use user._id
+
+        // Update the user's tasks
+        await User.findByIdAndUpdate(userId, { $addToSet: { tasks: taskId } });
+        
+        // Correcting the typo
+        await Task.findByIdAndUpdate(taskId, { $addToSet: { users: userId } });
+
+        // Send a response back or redirect
+        res.status(200).send("Member added to the task successfully.");
+        // Or, if you want to redirect
+        // res.redirect(`/project/${projectId}`); // Make sure to pass projectId accordingly
+
+    } catch (error) {
+        console.error("Add member error:", error);
+        res.status(500).send("Error while adding member. Please try again.");
+    }
+});
+
 
 // Star server functions
 const port = process.env.PORT || 5001;

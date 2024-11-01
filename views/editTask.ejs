@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Edit Task</title>
+</head> 
+<body>
+    <h1>Edit Task</h1>
+
+    
+
+    <!-- Navigation Buttons -->
+    <form action="/editTask/<%= task._id %>" method="post" style="display: inline;">
+        <button type="submit">Apply</button>
+    </form>
+
+    <form action="/project/<%= project._id %>" method="get" style="display: inline;">
+        <button type="submit">Cancel</button>
+    </form>
+</body>
+</html>
