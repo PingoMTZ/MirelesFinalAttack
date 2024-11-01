@@ -7,10 +7,44 @@
     <title><%= project.name %> Tasks</title>
 </head> 
 <body>
+    <h1>Tasks for Project: <%= project.name %></h1>
 
-    
+    <% if (tasks.length > 0) { %>
+        <ul>
+            <% tasks.forEach(function(task) { %>
+                <li>
+                    <strong>Task Name:</strong> <%= task.name %><br>
+                    <strong>Description:</strong> <%= task.description %><br>
+                    <strong>Priority:</strong> <%= task.priority %><br>
+                    <strong>Start Date:</strong> <%= task.startDate.toDateString() %><br>
+                    <strong>End Date:</strong> <%= task.endDate.toDateString() %><br>
+                    <strong>Time Estimation:</strong> <%= task.timeEstimation %> hours<br>
+                    <strong>Comments:</strong> <%= task.comments || 'N/A' %><br>
 
-    <!-- Botones de navegación -->
+                    <!-- Modify, Delete and Add Member buttons -->
+                    <% if (project.administrator.toString() === userId.toString()) { %>
+                        <form action="/task/edit/<%= task._id %>" method="get" style="display: inline;">
+                            <input type="hidden" name="projectId" value="<%= project._id %>">
+                            <button type="submit">Modify Task</button>
+                        </form>
+                        <form action="/task/delete/<%= task._id %>" method="post" style="display: inline;">
+                            <input type="hidden" name="projectId" value="<%= project._id %>">
+                            <button type="submit">Delete Task</button>
+                        </form>
+                        <form action="/task/addMember/<%= task._id %>" method="get" style="display: inline;">
+                            <input type="hidden" name="projectId" value="<%= project._id %>">
+                            <button type="submit">Add Task Member</button>
+                        </form>                       
+                    <% } %>
+                </li>
+                <hr>
+            <% }) %>
+        </ul>
+    <% } else { %>
+        <p>No tasks available</p>
+    <% } %>
+
+    <!-- Navigation Buttons -->
     <form action="/proyects" method="get" style="display: inline;">
         <button type="submit">Back to Projects</button>
     </form>
@@ -18,8 +52,8 @@
         <button type="submit">Create Task</button>
     </form>
     <form action="/addMember/<%= project._id %>" method="get" style="display: inline;">
-        <button type="submit">Add member</button>
+        <button type="submit">Add Member</button>
     </form>
-
 </body>
 </html>
+
