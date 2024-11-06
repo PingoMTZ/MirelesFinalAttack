@@ -16,11 +16,18 @@
                     <strong>Task Name:</strong> <%= task.name %><br>
                     <strong>Description:</strong> <%= task.description %><br>
                     <strong>Priority:</strong> <%= task.priority %><br>
-                    <strong>Start Date:</strong> <%= task.startDate.toDateString() %><br>
-                    <strong>End Date:</strong> <%= task.endDate.toDateString() %><br>
+                    <strong>Start Date:</strong> <%= new Date(task.startDate).toISOString().split('T')[0] %></p>
+                    <strong>End Date:</strong> <%= new Date(task.endDate).toISOString().split('T')[0] %></p>
                     <strong>Time Estimation:</strong> <%= task.timeEstimation %> hours<br>
                     <strong>Comments:</strong> <%= task.comments || 'N/A' %><br>
-
+                    <strong>Users:</strong> 
+                    <% if (task.users && task.users.length > 0) { %>
+                        <%= task.users.map(user => user.username).join(', ') %>
+                    <% } else { %>
+                        N/A
+                    <% } %>
+                    <br>
+                    <br>
                     <!-- Modify, Delete and Add Member buttons -->
                     <% if (project.administrator.toString() === userId.toString()) { %>
                         <form action="/task/edit/<%= task._id %>" method="get" style="display: inline;">

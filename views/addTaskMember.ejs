@@ -5,19 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Add Member to Task</title>
+    <script>
+        async function addMember(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = { member: formData.get('member') };
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert(result.message); // Show success message
+                } else {
+                    alert(result.error); // Show error message
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert("An error occurred. Please try again.");
+            }
+        }
+    </script>
 </head> 
 <body>
     <h1>Add Member to Task</h1>
 
-     <form action="/addTaskMember/<%= task._id %>" method="post" style="display: inline;">
-
+    <form action="/addTaskMember/<%= task._id %>" method="post" style="display: inline;" onsubmit="addMember(event)">
         <input type="text" name="member" placeholder="Username" required>
         <button type="submit">Add Member</button>
     </form>
 
-     <!-- Navigation Buttons -->
+    <!-- Navigation Buttons -->
     <form action="/project/<%= project._id %>" method="get" style="display: inline;">
         <button type="submit">Cancel</button>
-
+    </form>
 </body>
 </html>

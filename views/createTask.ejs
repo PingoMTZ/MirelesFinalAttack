@@ -48,6 +48,18 @@
         </form>
     </div>
 
+    <script>
+        document.getElementById('taskForm').addEventListener('submit', function(event) {
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
+    
+            if (endDate < startDate) {
+                alert("End date cannot be before start date.");
+                event.preventDefault(); // Prevent form submission
+            }
+        });
+    </script>    
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

@@ -193,7 +193,7 @@ app.post("/resetpassword", async (req, res) => {
 });
 
 // Change password page display
-app.get('/changepwd', (req, res) => {
+app.get('/changepwd', isAuthenticated, (req, res) => {
     res.render("changepwd");
 });
 
@@ -337,12 +337,19 @@ app.get("/proyects", isAuthenticated, async (req, res) => {
     }
 });
 
-// Changes made here
-app.get("/project/:projectId", async (req, res) => {
+app.get("/project/:projectId", isAuthenticated, async (req, res) => {
     const { projectId } = req.params;
 
     try {
-        const project = await Project.findById(projectId).populate("tasks");
+        // Populate both tasks and users within each task
+        const project = await Project.findById(projectId)
+            .populate({
+                path: "tasks",
+                populate: {
+                    path: "users", // Assuming 'users' is a reference to User schema in each task
+                    select: "username" // Only select the 'name' field from each user
+                }
+            });
 
         if (!project) {
             return res.status(404).send("Project not found");
@@ -356,6 +363,7 @@ app.get("/project/:projectId", async (req, res) => {
         res.status(500).send("Error fetching project tasks.");
     }
 });
+
 
 // Create projects page display
 app.get("/createprojects", isAuthenticated, (req, res) => {
@@ -410,7 +418,7 @@ app.get("/project/edit/:projectId", isAuthenticated, async (req, res) => {
 });
 
 // Ruta para actualizar los datos del proyecto
-app.post("/project/edit/:projectId", isAuthenticated, async (req, res) => {
+app.post("/project/edit/:projectId", async (req, res) => {
     const { projectId } = req.params;
     const { name, description, startDate, endDate } = req.body;
 
@@ -527,7 +535,7 @@ app.get("/addMember/:projectId", isAuthenticated, async (req, res) => {
     }
 });
 
-app.post("/addMember", isAuthenticated, async (req, res) => {
+app.post("/addMember", async (req, res) => {
     const { projectId, userId } = req.body;
 
     try {
@@ -576,7 +584,7 @@ app.get("/task/edit/:taskId", isAuthenticated, async (req, res) => {
 
 // Aqui va el app.post para edit task
 
-app.post("/task/delete/:taskId", isAuthenticated, async (req, res) => {
+app.post("/task/delete/:taskId", async (req, res) => {
     const { taskId } = req.params; // Retrieve taskId from the URL
     const { projectId } = req.body; // Retrieve projectId from body
 
@@ -607,7 +615,7 @@ app.post("/task/delete/:taskId", isAuthenticated, async (req, res) => {
     }
 });
 
-
+// Display view
 app.get("/task/addMember/:taskId", isAuthenticated, async (req, res) => {
     const { taskId } = req.params; // Retrieve taskId from the URL
     const { projectId } = req.query; // Retrieve projectId from query parameters
@@ -631,6 +639,8 @@ app.get("/task/addMember/:taskId", isAuthenticated, async (req, res) => {
     }
 });
 
+// Add member to task
+/*
 app.post("/addTaskMember/:taskId", isAuthenticated, async (req, res) => {
     try {
         const user = await User.findOne({ username: req.body.member });
@@ -658,6 +668,31 @@ app.post("/addTaskMember/:taskId", isAuthenticated, async (req, res) => {
         res.status(500).send("Error while adding member. Please try again.");
     }
 });
+*/
+
+app.post("/addTaskMember/:taskId", async (req, res) => {
+    try {
+        const user = await User.findOne({ username: req.body.member });
+        
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const { taskId } = req.params;
+        const userId = user._id;
+
+        // Update the user's tasks
+        await User.findByIdAndUpdate(userId, { $addToSet: { tasks: taskId } });
+        await Task.findByIdAndUpdate(taskId, { $addToSet: { users: userId } });
+
+        // Send a JSON response
+        res.status(200).json({ message: "Member added to the task successfully." });
+    } catch (error) {
+        console.error("Add member error:", error);
+        res.status(500).json({ error: "Error while adding member. Please try again." });
+    }
+});
+
 
 
 // Star server functions
