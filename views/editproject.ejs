@@ -37,5 +37,17 @@
         <button type="submit">Cancel</button>
     </form>
 
+    <script>
+        document.querySelector('form').addEventListener('submit', function(event) {
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
+    
+            if (endDate < startDate) {
+                alert("End date cannot be before start date.");
+                event.preventDefault(); // Prevent form submission
+            }
+        });
+    </script>    
+
 </body>
 </html>
