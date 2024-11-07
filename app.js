@@ -28,8 +28,9 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        maxAge: 600000
-    }
+        maxAge: 60000
+    },
+    rolling: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
@@ -534,31 +535,69 @@ app.get("/addMember/:projectId", isAuthenticated, async (req, res) => {
         res.status(500).send("Error fetching users");
     }
 });
-
-app.post("/addMember", async (req, res) => {
-    const { projectId, userId } = req.body;
-
+//agrear usuario a proyecto, que horror buscarlo
+/*app.post("/addMember", async (req, res) => {
+    const { projectId, username, email } = req.body;
     try {
         const project = await Project.findById(projectId);
 
         if (!project) {
             return res.status(404).send("Project not found");
         }
+        // Find the user by username and email
+        const user = await User.findOne({ username: username, email: email });
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+        await Project.findByIdAndUpdate(projectId, { $addToSet: { members: user._id } });
 
-        await Project.findByIdAndUpdate(projectId, { $addToSet: { members: userId } });
+        await User.findByIdAndUpdate(user._id, { $addToSet: { projects: projectId } });
 
-        await User.findByIdAndUpdate(userId, { $addToSet: { projects: projectId } });
-
-        res.redirect('/proyects');
+        res.render("proyects");
 
     } catch (error) {
         console.error("Error adding member:", error);
         res.status(500).send("Error adding member. Please try again.");
     }
+});*/
+
+app.post('/addMember', async (req, res) => {
+    const { projectId, username, email } = req.body;
+
+    try {
+        // Find the user by username or email
+        const user = await User.findOne({ username, email });
+
+        if (!user) {
+            return res.status(400).send('User not found');
+        }
+
+        // Find the project by its ID
+        const project = await Project.findById(projectId);
+
+        if (!project) {
+            return res.status(400).send('Project not found');
+        }
+
+        // Add the user to the project's member list
+        project.members.push(user._id);
+        await project.save();
+
+        await Project.findByIdAndUpdate(projectId, { $addToSet: { members: user._id } });
+
+        await User.findByIdAndUpdate(user._id, { $addToSet: { projects: projectId } });
+
+
+        // Redirect to the project page
+        res.redirect(`/project/${projectId}`);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error adding member');
+    }
 });
 
-// Funciones para los nuevos botones en el view de task
 
+// Funciones para los nuevos botones en el view de task
 app.get("/task/edit/:taskId", isAuthenticated, async (req, res) => {
     const { taskId } = req.params; // Retrieve taskId from the URL
     const { projectId } = req.query; // Retrieve projectId from query parameters
@@ -583,7 +622,6 @@ app.get("/task/edit/:taskId", isAuthenticated, async (req, res) => {
 });
 
 // Aqui va el app.post para edit task
-
 app.post("/task/delete/:taskId", async (req, res) => {
     const { taskId } = req.params; // Retrieve taskId from the URL
     const { projectId } = req.body; // Retrieve projectId from body
@@ -639,37 +677,6 @@ app.get("/task/addMember/:taskId", isAuthenticated, async (req, res) => {
     }
 });
 
-// Add member to task
-/*
-app.post("/addTaskMember/:taskId", isAuthenticated, async (req, res) => {
-    try {
-        const user = await User.findOne({ username: req.body.member });
-        
-        if (!user) {
-            return res.status(404).send("User not found");
-        }
-
-        const { taskId } = req.params;
-        const userId = user._id; // Directly use user._id
-
-        // Update the user's tasks
-        await User.findByIdAndUpdate(userId, { $addToSet: { tasks: taskId } });
-        
-        // Correcting the typo
-        await Task.findByIdAndUpdate(taskId, { $addToSet: { users: userId } });
-
-        // Send a response back or redirect
-        res.status(200).send("Member added to the task successfully.");
-        // Or, if you want to redirect
-        // res.redirect(`/project/${projectId}`); // Make sure to pass projectId accordingly
-
-    } catch (error) {
-        console.error("Add member error:", error);
-        res.status(500).send("Error while adding member. Please try again.");
-    }
-});
-*/
-
 app.post("/addTaskMember/:taskId", async (req, res) => {
     try {
         const user = await User.findOne({ username: req.body.member });
@@ -693,11 +700,8 @@ app.post("/addTaskMember/:taskId", async (req, res) => {
     }
 });
 
-
-
 // Star server functions
 const port = process.env.PORT || 5001;
-
 connectToDatabase().then(() => {
     app.listen(port, () => {
         console.log(`Server running on ${port}`);

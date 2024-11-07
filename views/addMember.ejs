@@ -11,17 +11,23 @@
         <h2>Add Member to Project</h2>
         <form id="addMemberForm" action="/addMember" method="POST">
             <input type="hidden" name="projectId" value="<%= projectId %>">
+            
+            <!-- Input for Username -->
             <div class="form-group">
-                <label for="member">Select an user</label>
-                <select class="form-control" id="member" name="userId" required>
-                    <% availableUser.forEach(function(user) { %>
-                    <option value="<%= user._id %>"><%= user.username %> - <%= user.email %></option>
-                <% }); %>
-                </select>
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
             </div>
+            
+            <!-- Input for Email -->
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+
             <button type="submit" class="btn btn-primary">Add Member</button>
             <a href="/project/<%= projectId %>" class="btn btn-secondary">Cancel</a>
         </form>
+
         <script>
             document.getElementById("addMemberForm").addEventListener("submit", function(event) {
                 event.preventDefault();
