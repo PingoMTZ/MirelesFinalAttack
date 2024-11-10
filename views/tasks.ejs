@@ -16,6 +16,7 @@
                     <strong>Task Name:</strong> <%= task.name %><br>
                     <strong>Description:</strong> <%= task.description %><br>
                     <strong>Priority:</strong> <%= task.priority %><br>
+                    <strong>Progress:</strong> <%= task.progress %><br>
                     <strong>Start Date:</strong> <%= new Date(task.startDate).toISOString().split('T')[0] %></p>
                     <strong>End Date:</strong> <%= new Date(task.endDate).toISOString().split('T')[0] %></p>
                     <strong>Time Estimation:</strong> <%= task.timeEstimation %> hours<br>
