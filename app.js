@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const User = require("./model/User");
 const Project = require("./model/Projects");
 const Task = require("./model/Tasks");
+const Tasks = require('./model/Tasks');
 require('dotenv').config();
 
 const uri = process.env.DB_URI;
@@ -365,7 +366,6 @@ app.get("/project/:projectId", isAuthenticated, async (req, res) => {
     }
 });
 
-
 // Create projects page display
 app.get("/createprojects", isAuthenticated, (req, res) => {
     const userId = req.session.user;
@@ -438,7 +438,6 @@ app.post("/project/edit/:projectId", async (req, res) => {
     }
 });
 
-
 app.post("/deleteProject", async (req, res) => {
     const { userId, projectId } = req.body;
     try {
@@ -468,8 +467,9 @@ app.post("/deleteProject", async (req, res) => {
     
 });
 
+// Create Task
 app.post("/tasks", async (req, res) => {
-    const { projectId, taskTitle, taskDescription, priority, startDate, endDate, timeEstimation, comments, assigneeName } = req.body;
+    const { projectId, taskTitle, taskDescription, priority, progress, startDate, endDate, timeEstimation, comments} = req.body;
     
     try {
         // Creates a new task
@@ -477,6 +477,7 @@ app.post("/tasks", async (req, res) => {
             name: taskTitle,
             description: taskDescription,
             priority,
+            progress,
             startDate: new Date(startDate),
             endDate: new Date(endDate),
             timeEstimation,
@@ -535,31 +536,6 @@ app.get("/addMember/:projectId", isAuthenticated, async (req, res) => {
         res.status(500).send("Error fetching users");
     }
 });
-//agrear usuario a proyecto, que horror buscarlo
-/*app.post("/addMember", async (req, res) => {
-    const { projectId, username, email } = req.body;
-    try {
-        const project = await Project.findById(projectId);
-
-        if (!project) {
-            return res.status(404).send("Project not found");
-        }
-        // Find the user by username and email
-        const user = await User.findOne({ username: username, email: email });
-        if (!user) {
-            return res.status(404).send("User not found");
-        }
-        await Project.findByIdAndUpdate(projectId, { $addToSet: { members: user._id } });
-
-        await User.findByIdAndUpdate(user._id, { $addToSet: { projects: projectId } });
-
-        res.render("proyects");
-
-    } catch (error) {
-        console.error("Error adding member:", error);
-        res.status(500).send("Error adding member. Please try again.");
-    }
-});*/
 
 app.post('/addMember', async (req, res) => {
     const { projectId, username, email } = req.body;
@@ -596,7 +572,6 @@ app.post('/addMember', async (req, res) => {
     }
 });
 
-
 // Funciones para los nuevos botones en el view de task
 app.get("/task/edit/:taskId", isAuthenticated, async (req, res) => {
     const { taskId } = req.params; // Retrieve taskId from the URL
@@ -622,6 +597,29 @@ app.get("/task/edit/:taskId", isAuthenticated, async (req, res) => {
 });
 
 // Aqui va el app.post para edit task
+app.post("/task/edit/:taskId", isAuthenticated, async (req, res) => {
+    const { taskId } = req.params; // Retrieve taskId from the URL
+    const { projectId, name, description, priority, progress, startDate, endDate, timeEstimation, comments } = req.body;
+
+    try {
+        await Tasks.findByIdAndUpdate(taskId, {
+            name,
+            description,
+            priority,
+            progress,
+            startDate: new Date(startDate),
+            endDate: new Date(endDate),
+            timeEstimation,
+            comments,
+        });
+
+        res.redirect(`/project/${projectId}`);
+    } catch (error) {
+        console.error("Error updating project:", error);
+        res.status(500).send("Error updating project. Please try again.");
+    }
+});
+
 app.post("/task/delete/:taskId", async (req, res) => {
     const { taskId } = req.params; // Retrieve taskId from the URL
     const { projectId } = req.body; // Retrieve projectId from body

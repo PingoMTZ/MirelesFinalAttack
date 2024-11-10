@@ -14,6 +14,11 @@ const TaskSchema = new mongoose.Schema({
         enum: ['low', 'medium', 'high'],
         default: 'medium'
     },
+    progress: {
+        type: String,
+        enum: ['Not_Started', 'In_Progress', 'Finished', 'We_are_Cooked_Chat'],
+        default: 'Not_Started'
+    },
     startDate: {
         type: Date,
         required: true
@@ -38,7 +43,7 @@ const TaskSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Project', // Reference to Project model
         required: true
-    }
+    },
 });
 
 module.exports = mongoose.model('Task', TaskSchema);
