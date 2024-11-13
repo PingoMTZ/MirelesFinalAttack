@@ -53,14 +53,22 @@
     <% } %>
 
     <!-- Botones de Navegación -->
-    <form action="/proyects" method="get" style="display: inline;">
-        <button type="submit">Regresar a Proyectos</button>
-    </form>
     <form action="/createTask/<%= project._id %>" method="get" style="display: inline;">
         <button type="submit">Crear Tarea</button>
     </form>
+
+    <br>
+    <br>
+
     <form action="/addMember/<%= project._id %>" method="get" style="display: inline;">
         <button type="submit">Agregar Miembro</button>
+    </form>
+
+    <br>
+    <br>
+
+    <form action="/proyects" method="get" style="display: inline;">
+        <button type="submit">Regresar a Proyectos</button>
     </form>
 </body>
 </html>

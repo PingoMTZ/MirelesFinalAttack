@@ -124,7 +124,7 @@ app.post("/register", async (req, res) => {
         await User.create(data);
         
         // Set a success message in the session
-        req.session.message = "User registered successfully";
+        req.session.message = "Usuario registrador exitosamente";
         
         // Redirect to login
         res.redirect("/");
