@@ -1,31 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es_mx">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <title>Add Member to Project</title>
+    <title>Agreagar Miembro al Proyecto</title>
 </head>
 <body>
     <div class="container mt-5">
-        <h2>Add Member to Project</h2>
+        <h2>Agregar Miembro al Proyecto</h2>
         <form id="addMemberForm" action="/addMember" method="POST">
             <input type="hidden" name="projectId" value="<%= projectId %>">
             
-            <!-- Input for Username -->
+            <!-- Input para el Nombre de Usuario -->
             <div class="form-group">
-                <label for="username">Username</label>
+                <label for="username">Nombre de Usuario</label>
                 <input type="text" class="form-control" id="username" name="username" required>
             </div>
             
-            <!-- Input for Email -->
+            <!-- Input para el Email -->
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" class="form-control" id="email" name="email" required>
             </div>
 
-            <button type="submit" class="btn btn-primary">Add Member</button>
-            <a href="/project/<%= projectId %>" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Agregar Miembro</button>
+            <a href="/project/<%= projectId %>" class="btn btn-secondary">Cancelar</a>
         </form>
 
         <script>
@@ -38,7 +38,7 @@
                     if (response.ok) {
                         window.location.href = "/proyects"; // Redirects to the projects page
                     } else {
-                        alert("Failed to add member. Please try again.");
+                        alert("No se pudo agregar miembro. Vuelvelo a Intentar.");
                     }
                 }).catch(error => console.error('Error:', error));
             });

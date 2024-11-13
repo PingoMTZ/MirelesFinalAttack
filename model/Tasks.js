@@ -11,13 +11,13 @@ const TaskSchema = new mongoose.Schema({
     },
     priority: {
         type: String,
-        enum: ['low', 'medium', 'high'],
-        default: 'medium'
+        enum: ['baja', 'media', 'alta'],
+        default: 'media'
     },
     progress: {
         type: String,
-        enum: ['Not_Started', 'In_Progress', 'Finished', 'We_are_Cooked_Chat'],
-        default: 'Not_Started'
+        enum: ['No Iniciado', 'En Progreso', 'Terminada', 'We_are_Cooked_Chat'],
+        default: 'No Iniciado'
     },
     startDate: {
         type: Date,
