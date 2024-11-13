@@ -1,70 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es_mx">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Edit Task</title>
+    <title>Editar Tarea</title>
 </head> 
 <body>
-    <h1>Edit Task</h1>
+    <h1>Editar Tarea</h1>
 
     <form action="/task/edit/<%= task._id %>" method="POST">
         <input type="hidden" name="projectId" value="<%= project._id %>">
         <div>
-            <label for="name">Task Name:</label>
+            <label for="name">Nombre de Tarea:</label>
             <input type="text" id="name" name="name" value="<%= task.name %>" required>
         </div>
 
         <div>
-            <label for="description">Description:</label>
+            <label for="description">Descripcion:</label>
             <textarea id="description" name="description"><%= task.description %></textarea>
         </div>
 
         <div>
-            <label for="priority">Priority:</label>
+            <label for="priority">Prioridad:</label>
             <select id="priority" name="priority">
-                <option value="low" <%= task.priority === 'low' ? 'selected' : '' %>>Low</option>
-                <option value="medium" <%= task.priority === 'medium' ? 'selected' : '' %>>Medium</option>
-                <option value="high" <%= task.priority === 'high' ? 'selected' : '' %>>High</option>
+                <option value="baja" <%= task.priority === 'baja' ? 'selected' : '' %>>Baja</option>
+                <option value="media" <%= task.priority === 'media' ? 'selected' : '' %>>Media</option>
+                <option value="alta" <%= task.priority === 'alta' ? 'selected' : '' %>>Alta</option>
             </select>
         </div>
 
         <div>
-            <label for="progress">Progress:</label>
+            <label for="progress">Progreso:</label>
             <select id="progress" name="progress">
-                <option value="Not_Started" <%= task.progress === 'Not_Started' ? 'selected' : '' %>>Not Started</option>
-                <option value="In_Progress" <%= task.progress === 'In_Progress' ? 'selected' : '' %>>In Progress</option>
-                <option value="Finished" <%= task.progress === 'Finished' ? 'selected' : '' %>>Finished</option>
+                <option value="No Iniciado" <%= task.progress === 'No Iniciado' ? 'selected' : '' %>>Not Started</option>
+                <option value="En Progreso" <%= task.progress === 'En Progreso' ? 'selected' : '' %>>In Progress</option>
+                <option value="Terminada" <%= task.progress === 'Terminada' ? 'selected' : '' %>>Finished</option>
                 <option value="We_are_Cooked_Chat" <%= task.progress === 'We_are_Cooked_Chat' ? 'selected' : '' %>>Cooked</option>
             </select>
         </div>
 
         <div>
-            <label for="startDate">Start Date:</label>
+            <label for="startDate">Fecha de Inicio:</label>
             <input type="date" id="startDate" name="startDate" value="<%= new Date(task.startDate).toISOString().split('T')[0] %>" required>
         </div>
 
         <div>
-            <label for="endDate">End Date:</label>
+            <label for="endDate">Fecha de Cierre:</label>
             <input type="date" id="endDate" name="endDate" value="<%= new Date(task.endDate).toISOString().split('T')[0] %>" required>
         </div>
 
         <div>
-            <label for="timeEstimation">Time Estimation:</label>
+            <label for="timeEstimation">Estimación de Tiempo:</label>
             <input type="number" id="timeEstimation" name="timeEstimation" value="<%= task.timeEstimation %>" required>
         </div>
 
         <div>
-            <label for="comments">Comments:</label>
+            <label for="comments">Comentarios:</label>
             <textarea id="comments" name="comments"><%= task.comments %></textarea>
         </div>
 
-        <button type="submit">Save</button>
+        <button type="submit">Guardar</button>
     </form>
 
     <form action="/project/<%= project._id %>" method="get" style="display: inline;">
-        <button type="submit">Cancel</button>
+        <button type="submit">Cancelar</button>
     </form>
 
     <script>
@@ -73,7 +73,7 @@
             const endDate = new Date(document.getElementById('endDate').value);
     
             if (endDate < startDate) {
-                alert("End date cannot be before start date.");
+                alert("La fecha de cierre no puede estar antes de la fecha de inicio.");
                 event.preventDefault(); // Prevent form submission
             }
         });

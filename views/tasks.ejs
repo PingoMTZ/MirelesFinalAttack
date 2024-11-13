@@ -1,27 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es_mx">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title><%= project.name %> Tasks</title>
+    <title>Tareas de <%= project.name %></title>
 </head> 
 <body>
-    <h1>Tasks for Project: <%= project.name %></h1>
+    <h1>Tareas del Proyecto: <%= project.name %></h1>
 
     <% if (tasks.length > 0) { %>
         <ul>
             <% tasks.forEach(function(task) { %>
                 <li>
-                    <strong>Task Name:</strong> <%= task.name %><br>
-                    <strong>Description:</strong> <%= task.description %><br>
-                    <strong>Priority:</strong> <%= task.priority %><br>
-                    <strong>Progress:</strong> <%= task.progress %><br>
-                    <strong>Start Date:</strong> <%= new Date(task.startDate).toISOString().split('T')[0] %></p>
-                    <strong>End Date:</strong> <%= new Date(task.endDate).toISOString().split('T')[0] %></p>
-                    <strong>Time Estimation:</strong> <%= task.timeEstimation %> hours<br>
-                    <strong>Comments:</strong> <%= task.comments || 'N/A' %><br>
-                    <strong>Users:</strong> 
+                    <strong>Nombre:</strong> <%= task.name %><br>
+                    <strong>Descripcion:</strong> <%= task.description %><br>
+                    <strong>Prioridad:</strong> <%= task.priority %><br>
+                    <strong>Progreso:</strong> <%= task.progress %><br>
+                    <strong>Fecha de Inicio:</strong> <%= new Date(task.startDate).toISOString().split('T')[0] %></p>
+                    <strong>Fecha de Cierre:</strong> <%= new Date(task.endDate).toISOString().split('T')[0] %></p>
+                    <strong>Estimación de Tiempo:</strong> <%= task.timeEstimation %> hours<br>
+                    <strong>Comentarios:</strong> <%= task.comments || 'N/A' %><br>
+                    <strong>Usuarios:</strong> 
                     <% if (task.users && task.users.length > 0) { %>
                         <%= task.users.map(user => user.username).join(', ') %>
                     <% } else { %>
@@ -29,19 +29,19 @@
                     <% } %>
                     <br>
                     <br>
-                    <!-- Modify, Delete and Add Member buttons -->
+                    <!-- Botones para modificar, eliminar y agregar miembror -->
                     <% if (project.administrator.toString() === userId.toString()) { %>
                         <form action="/task/edit/<%= task._id %>" method="get" style="display: inline;">
                             <input type="hidden" name="projectId" value="<%= project._id %>">
-                            <button type="submit">Modify Task</button>
+                            <button type="submit">Modificar Tarea</button>
                         </form>
                         <form action="/task/delete/<%= task._id %>" method="post" style="display: inline;">
                             <input type="hidden" name="projectId" value="<%= project._id %>">
-                            <button type="submit">Delete Task</button>
+                            <button type="submit">Eliminar Tarea</button>
                         </form>
                         <form action="/task/addMember/<%= task._id %>" method="get" style="display: inline;">
                             <input type="hidden" name="projectId" value="<%= project._id %>">
-                            <button type="submit">Add Task Member</button>
+                            <button type="submit">Agregar Miembro a Tarea</button>
                         </form>                       
                     <% } %>
                 </li>
@@ -49,18 +49,18 @@
             <% }) %>
         </ul>
     <% } else { %>
-        <p>No tasks available</p>
+        <p>No hay Tareas disponibles.</p>
     <% } %>
 
-    <!-- Navigation Buttons -->
+    <!-- Botones de Navegación -->
     <form action="/proyects" method="get" style="display: inline;">
-        <button type="submit">Back to Projects</button>
+        <button type="submit">Regresar a Proyectos</button>
     </form>
     <form action="/createTask/<%= project._id %>" method="get" style="display: inline;">
-        <button type="submit">Create Task</button>
+        <button type="submit">Crear Tarea</button>
     </form>
     <form action="/addMember/<%= project._id %>" method="get" style="display: inline;">
-        <button type="submit">Add Member</button>
+        <button type="submit">Agregar Miembro</button>
     </form>
 </body>
 </html>

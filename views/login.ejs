@@ -1,37 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es_mx">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Login</title>
+    <title>Inicio de Sesion</title>
 </head>
 <body>
 
-    <h1>Login</h1>
+    <h1>Inicio de Sesion</h1>
 
     <% if (message) { %>
         <p style="color: green;"><%= message %></p>
     <% } %>
 
     <form action="/" method="POST">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Login</button>
+        <input type="text" name="username" placeholder="Nombre de Usuario" required>
+        <input type="password" name="password" placeholder="Contraseña" required>
+        <button type="submit">Iniciar Sesion</button>
     </form>
 
     <br>
 
     <form action="/register" method="get" style="display: inline;">
-        <button type="submit">Register</button>
+        <button type="submit">Registrarte</button>
     </form>
 
     <br>
     <br>
 
     <form action="/recoverpwd" method="get" style="display: inline;">
-        <p>You dont remeber your password?</p>
-        <button type="submit">Recover password</button>
+        <p>No recuerdas tu contraseña?</p>
+        <button type="submit">Recuperar tu contraseña</button>
     </form>
 
     <br>

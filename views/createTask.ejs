@@ -1,59 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es_mx">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <title>Task Form</title>
+    <title>Crear Tarea</title>
 </head>
 <body>
     <div class="container mt-5">
-        <h2>Create Task for <%= project.name %></h2>
+        <h2>Crear Tarea para <%= project.name %></h2>
         <form id="taskForm" method="POST" action="/tasks">
             <input type="hidden" name="projectId" value="<%= project._id %>">
             <div class="form-group">
-                <label for="taskTitle">Task Title</label>
+                <label for="taskTitle">Nombre de Tarea</label>
                 <input type="text" class="form-control" id="taskTitle" name="taskTitle" required>
             </div>
             <div class="form-group">
-                <label for="taskDescription">Description</label>
+                <label for="taskDescription">Descripcion</label>
                 <textarea class="form-control" id="taskDescription" name="taskDescription"></textarea>
             </div>
             <div class="form-group">
-                <label for="priority">Priority</label>
+                <label for="priority">Prioridad</label>
                 <select class="form-control" id="priority" name="priority" required>
-                    <option value="low">Low</option>
-                    <option value="medium" selected>Medium</option>
-                    <option value="high">High</option>
+                    <option value="baja">Baja</option>
+                    <option value="media" selected>Media</option>
+                    <option value="alta">Alta</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="progress">Progress</label>
+                <label for="progress">Progreso</label>
                 <select class="form-control" id="progress" name="progress" required>
-                    <option value="Not_Started" selected>Not Started</option>
-                    <option value="In_Progress">In Progress</option>
-                    <option value="Finished">Finished</option>
+                    <option value="No Iniciado" selected>No Iniciado</option>
+                    <option value="En Progreso">En Progreso</option>
+                    <option value="Terminada">Terminada</option>
                     <option value="We_are_Cooked_Chat">Cooked</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="startDate">Start Date</label>
+                <label for="startDate">Fecha de Inicio</label>
                 <input type="date" class="form-control" id="startDate" name="startDate" required>
             </div>
             <div class="form-group">
-                <label for="endDate">End Date</label>
+                <label for="endDate">Fecha de Cierre</label>
                 <input type="date" class="form-control" id="endDate" name="endDate" required>
             </div>
             <div class="form-group">
-                <label for="timeEstimation">Time Estimation (hours)</label>
+                <label for="timeEstimation">Tiempo Estimado (horas)</label>
                 <input type="number" class="form-control" id="timeEstimation" name="timeEstimation" required>
             </div>
             <div class="form-group">
-                <label for="comments">Comments</label>
+                <label for="comments">Comentarios</label>
                 <textarea class="form-control" id="comments" name="comments"></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">Create Task</button>
-            <a href="/project/<%= project._id %>" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Crear Tarea</button>
+            <a href="/project/<%= project._id %>" class="btn btn-secondary">Cancelar</a>
         </form>
     </div>
 
