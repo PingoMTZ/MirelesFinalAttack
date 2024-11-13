@@ -658,17 +658,11 @@ app.get("/task/addMember/:taskId", isAuthenticated, async (req, res) => {
 
     try {
         const task = await Task.findById(taskId);
-        const project = await Project.findById(projectId);
+        const project = await Project.findById(projectId).populate("members");
 
-        if (!task) {
-            return res.status(404).send("Task was not found");
-        }
+        const availableUsers = project.members;
 
-        if (!project) {
-            return res.status(404).send("Project was not found");
-        }
-
-        res.render("addTaskMember", { task, project }); // Pass the task and projectId to the view
+        res.render("addTaskMember", { task, projectId, availableUsers: availableUsers}); // Pass the task and projectId to the view
     } catch (error) {
         console.error("Error fetching task or project:", error);
         res.status(500).send("Error fetching task or project.");
@@ -677,26 +671,32 @@ app.get("/task/addMember/:taskId", isAuthenticated, async (req, res) => {
 
 app.post("/addTaskMember/:taskId", async (req, res) => {
     try {
-        const user = await User.findOne({ username: req.body.member });
+        // Use `userId` from the form submission, not `member`
+        const { userId } = req.body;  // Get userId from the form submission
         
+        // Find the user by their `userId`
+        const user = await User.findById(userId);
+
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
 
         const { taskId } = req.params;
-        const userId = user._id;
 
-        // Update the user's tasks
+        // Add the task to the user's tasks array
         await User.findByIdAndUpdate(userId, { $addToSet: { tasks: taskId } });
+
+        // Add the user to the task's users array
         await Task.findByIdAndUpdate(taskId, { $addToSet: { users: userId } });
 
-        // Send a JSON response
+        // Send a success response
         res.status(200).json({ message: "Member added to the task successfully." });
     } catch (error) {
         console.error("Add member error:", error);
         res.status(500).json({ error: "Error while adding member. Please try again." });
     }
 });
+
 
 // Star server functions
 const port = process.env.PORT || 5001;
