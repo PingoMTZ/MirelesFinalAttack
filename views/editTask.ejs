@@ -60,6 +60,17 @@
         <textarea id="comments" name="comments"><%= task.comments %></textarea>
     </div>
 
+
+    <div>
+        <label for="progress">Progreso:</label>
+        <select id="progress" name="progress">
+            <option value="No Iniciado" <%= task.progress === 'No Iniciado' ? 'selected' : '' %>>Not Started</option>
+            <option value="En Progreso" <%= task.progress === 'En Progreso' ? 'selected' : '' %>>In Progress</option>
+            <option value="Terminada" <%= task.progress === 'Terminada' ? 'selected' : '' %>>Finished</option>
+            <option value="We_are_Cooked_Chat" <%= task.progress === 'We_are_Cooked_Chat' ? 'selected' : '' %>>Cooked</option>
+        </select>
+    </div>
+
     <button type="submit">Guardar</button>
     </form>
 

@@ -29,10 +29,12 @@
                     <% } %>
                     <br>
                     <br>
+                    <% if (project.administrator.toString() === userId.toString() || task.users.some(user => user._id.toString() === userId.toString())) { %>
                     <form action="/task/edit/<%= task._id %>" method="get" style="display: inline;">
                         <input type="hidden" name="projectId" value="<%= project._id %>">
                         <button type="submit">Modificar Tarea</button>
                     </form>
+                    <% } %>
                     <!-- Botones para modificar, eliminar y agregar miembror -->
                     <% if (project.administrator.toString() === userId.toString()) { %>
                         <form action="/task/delete/<%= task._id %>" method="post" style="display: inline;">
