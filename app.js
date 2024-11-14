@@ -616,7 +616,7 @@ app.post("/task/edit/:taskId", isAuthenticated, async (req, res) => {
 
         const updates = isAdmin
             ? { name, description, priority, progress, timeEstimation, comments }
-            : { comments }; // Solo permitir comentarios si no es administrador
+            : { comments, progress }; // Solo permitir comentarios si no es administrador
 
         if (isAdmin) {
             if (startDate) updates.startDate = new Date(startDate);
