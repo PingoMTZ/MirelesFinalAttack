@@ -41,6 +41,15 @@
     </ul>
     
     <!-- Buttons -->
+
+    <form action="/createprojects" method="get" style="display: inline;">
+        <input type="hidden" name="userId" value="<%= userId %>">
+        <button type="submit">Crear proyecto</button>
+    </form>
+    
+    <br>
+    <br>
+
     <form action="/logout" method="get" style="display: inline;">
         <button type="submit">Cerrar sesión</button>
     </form>
@@ -54,14 +63,6 @@
         <button type="submit">Cambiar contraseña</button>
     </form>
 
-    <br>
-    <br>
-
-    <form action="/createprojects" method="get" style="display: inline;">
-        <input type="hidden" name="userId" value="<%= userId %>">
-        <button type="submit">Crear proyecto</button>
-    </form>
-    
     <br>
     <br>
     
