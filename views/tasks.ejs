@@ -21,7 +21,7 @@
                     <strong>Fecha de Cierre:</strong> <%= new Date(task.endDate).toISOString().split('T')[0] %></p>
                     <strong>Estimación de Tiempo:</strong> <%= task.timeEstimation %> hours<br>
                     <strong>Comentarios:</strong> <%= task.comments || 'N/A' %><br>
-                    <strong>Usuarios:</strong> 
+                    <strong>Encargado:</strong> 
                     <% if (task.users && task.users.length > 0) { %>
                         <%= task.users.map(user => user.username).join(', ') %>
                     <% } else { %>
@@ -29,12 +29,12 @@
                     <% } %>
                     <br>
                     <br>
+                    <form action="/task/edit/<%= task._id %>" method="get" style="display: inline;">
+                        <input type="hidden" name="projectId" value="<%= project._id %>">
+                        <button type="submit">Modificar Tarea</button>
+                    </form>
                     <!-- Botones para modificar, eliminar y agregar miembror -->
                     <% if (project.administrator.toString() === userId.toString()) { %>
-                        <form action="/task/edit/<%= task._id %>" method="get" style="display: inline;">
-                            <input type="hidden" name="projectId" value="<%= project._id %>">
-                            <button type="submit">Modificar Tarea</button>
-                        </form>
                         <form action="/task/delete/<%= task._id %>" method="post" style="display: inline;">
                             <input type="hidden" name="projectId" value="<%= project._id %>">
                             <button type="submit">Eliminar Tarea</button>
@@ -57,12 +57,16 @@
         <button type="submit">Crear Tarea</button>
     </form>
 
-    <br>
-    <br>
+    <% if (project.administrator.toString() === userId.toString()) { %>
+        
+        <br>
+        <br>
 
-    <form action="/addMember/<%= project._id %>" method="get" style="display: inline;">
-        <button type="submit">Agregar Miembro</button>
-    </form>
+        <form action="/addMember/<%= project._id %>" method="get" style="display: inline;">
+            <button type="submit">Agregar Miembro</button>
+        </form>
+    <% } %>
+
 
     <br>
     <br>

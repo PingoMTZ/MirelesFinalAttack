@@ -576,7 +576,8 @@ app.post('/addMember', async (req, res) => {
 app.get("/task/edit/:taskId", isAuthenticated, async (req, res) => {
     const { taskId } = req.params; // Retrieve taskId from the URL
     const { projectId } = req.query; // Retrieve projectId from query parameters
-
+    const userId = req.session.user;
+    
     try {
         const task = await Task.findById(taskId);
         const project = await Project.findById(projectId);
@@ -589,7 +590,7 @@ app.get("/task/edit/:taskId", isAuthenticated, async (req, res) => {
             return res.status(404).send("Project was not found");
         }
 
-        res.render("editTask", { task, project }); // Pass the task and projectId to the view
+        res.render("editTask", { userId, task, project }); // Pass the task and projectId to the view
     } catch (error) {
         console.error("Error fetching task:", error);
         res.status(500).send("Error fetching task.");
@@ -598,27 +599,41 @@ app.get("/task/edit/:taskId", isAuthenticated, async (req, res) => {
 
 // Aqui va el app.post para edit task
 app.post("/task/edit/:taskId", isAuthenticated, async (req, res) => {
-    const { taskId } = req.params; // Retrieve taskId from the URL
+    const { taskId } = req.params;
     const { projectId, name, description, priority, progress, startDate, endDate, timeEstimation, comments } = req.body;
 
     try {
-        await Tasks.findByIdAndUpdate(taskId, {
-            name,
-            description,
-            priority,
-            progress,
-            startDate: new Date(startDate),
-            endDate: new Date(endDate),
-            timeEstimation,
-            comments,
-        });
+        if (!req.session.user) {
+            return res.status(401).send("Usuario no autenticado.");
+        }
 
+        const project = await Project.findById(projectId);
+        if (!project) {
+            return res.status(404).send("Proyecto no encontrado.");
+        }
+
+        const isAdmin = project.administrator.toString() === req.session.user.toString();
+
+        const updates = isAdmin
+            ? { name, description, priority, progress, timeEstimation, comments }
+            : { comments }; // Solo permitir comentarios si no es administrador
+
+        if (isAdmin) {
+            if (startDate) updates.startDate = new Date(startDate);
+            if (endDate) updates.endDate = new Date(endDate);
+        }
+
+        await Task.findByIdAndUpdate(taskId, updates);
         res.redirect(`/project/${projectId}`);
     } catch (error) {
-        console.error("Error updating project:", error);
-        res.status(500).send("Error updating project. Please try again.");
+        console.error("Error updating task:", error);
+        res.status(500).send("Error updating task. Please try again.");
     }
 });
+
+
+
+
 
 app.post("/task/delete/:taskId", async (req, res) => {
     const { taskId } = req.params; // Retrieve taskId from the URL
