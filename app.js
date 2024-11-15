@@ -2,11 +2,9 @@ const express = require('express');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
-
 const User = require("./model/User");
 const Project = require("./model/Projects");
 const Task = require("./model/Tasks");
-const Tasks = require('./model/Tasks');
 require('dotenv').config();
 
 const uri = process.env.DB_URI;
@@ -22,7 +20,6 @@ async function connectToDatabase() {
         process.exit(1); // Exit the application if unable to connect
     }
 }
-
 const app = express();
 app.use(session({
     secret: 'your_secret_key',
@@ -48,7 +45,6 @@ app.use((req, res, next) => {
     res.set("Cache-Control", "no-store"); // Prevent caching
     next();
 });
-
 // LogOut Function
 app.get("/logout", (req, res) => {
     req.session.destroy((err) => {
@@ -60,7 +56,6 @@ app.get("/logout", (req, res) => {
         res.redirect("/"); // Redirect to the login page after logout
     });
 });
-
 // Login page display
 app.get("/", (req, res) => {
     const message = req.session.message;
@@ -68,7 +63,6 @@ app.get("/", (req, res) => {
     req.session.message = null;
     res.render("login", { message });
 });
-
 // New Login
 app.post("/", async (req, res) => {
     try {
@@ -366,6 +360,7 @@ app.get("/project/:projectId", isAuthenticated, async (req, res) => {
     }
 });
 
+
 // Create projects page display
 app.get("/createprojects", isAuthenticated, (req, res) => {
     const userId = req.session.user;
@@ -438,6 +433,7 @@ app.post("/project/edit/:projectId", async (req, res) => {
     }
 });
 
+
 app.post("/deleteProject", async (req, res) => {
     const { userId, projectId } = req.body;
     try {
@@ -467,9 +463,8 @@ app.post("/deleteProject", async (req, res) => {
     
 });
 
-// Create Task
 app.post("/tasks", async (req, res) => {
-    const { projectId, taskTitle, taskDescription, priority, progress, startDate, endDate, timeEstimation, comments} = req.body;
+    const { projectId, taskTitle, taskDescription, priority, startDate, endDate, timeEstimation, comments, assigneeName } = req.body;
     
     try {
         // Creates a new task
@@ -477,13 +472,8 @@ app.post("/tasks", async (req, res) => {
             name: taskTitle,
             description: taskDescription,
             priority,
-            progress,
             startDate: new Date(startDate),
-            endDate: new Date(endDate),
-            timeEstimation,
-            comments,
-            users: [],
-            project: projectId
+            endDate: new Date(endDate),   timeEstimation,        comments, users: [],project: projectId
         });
 
         await newTask.save();
@@ -498,7 +488,6 @@ app.post("/tasks", async (req, res) => {
         res.status(500).send("Error creating task. Please try again.");
     }
 });
-
 
 app.get("/createTask/:projectId", isAuthenticated, async (req, res) => {
     const { projectId } = req.params;
@@ -536,7 +525,7 @@ app.get("/addMember/:projectId", isAuthenticated, async (req, res) => {
         res.status(500).send("Error fetching users");
     }
 });
-
+//agrear usuario a proyecto, que horror buscarlo
 app.post('/addMember', async (req, res) => {
     const { projectId, username, email } = req.body;
 
@@ -571,7 +560,6 @@ app.post('/addMember', async (req, res) => {
         res.status(500).send('Error adding member');
     }
 });
-
 // Funciones para los nuevos botones en el view de task
 app.get("/task/edit/:taskId", isAuthenticated, async (req, res) => {
     const { taskId } = req.params; // Retrieve taskId from the URL
@@ -595,31 +583,7 @@ app.get("/task/edit/:taskId", isAuthenticated, async (req, res) => {
         res.status(500).send("Error fetching task.");
     }
 });
-
 // Aqui va el app.post para edit task
-app.post("/task/edit/:taskId", isAuthenticated, async (req, res) => {
-    const { taskId } = req.params; // Retrieve taskId from the URL
-    const { projectId, name, description, priority, progress, startDate, endDate, timeEstimation, comments } = req.body;
-
-    try {
-        await Tasks.findByIdAndUpdate(taskId, {
-            name,
-            description,
-            priority,
-            progress,
-            startDate: new Date(startDate),
-            endDate: new Date(endDate),
-            timeEstimation,
-            comments,
-        });
-
-        res.redirect(`/project/${projectId}`);
-    } catch (error) {
-        console.error("Error updating project:", error);
-        res.status(500).send("Error updating project. Please try again.");
-    }
-});
-
 app.post("/task/delete/:taskId", async (req, res) => {
     const { taskId } = req.params; // Retrieve taskId from the URL
     const { projectId } = req.body; // Retrieve projectId from body
@@ -630,19 +594,15 @@ app.post("/task/delete/:taskId", async (req, res) => {
         if (!task) {
             return res.status(404).send("Task not found");
         }
-
         // Update the project by removing the task reference
         await Project.findByIdAndUpdate(projectId, { $pull: { tasks: taskId } });
-
         // Update users by removing the task reference from their tasks array
         await User.updateMany(
             { _id: { $in: task.users } }, // Find all users assigned to this task
             { $pull: { tasks: taskId } }   // Remove the task from their tasks array
         );
-
         // Delete the task from the database
         await Task.findByIdAndDelete(taskId);
-
         // Redirect to the project tasks view or send a success message
         res.redirect(`/project/${projectId}`);
     } catch (error) {
@@ -650,46 +610,36 @@ app.post("/task/delete/:taskId", async (req, res) => {
         res.status(500).send("Error while deleting task. Please try again.");
     }
 });
-
 // Display view
 app.get("/task/addMember/:taskId", isAuthenticated, async (req, res) => {
     const { taskId } = req.params; // Retrieve taskId from the URL
     const { projectId } = req.query; // Retrieve projectId from query parameters
-
     try {
         const task = await Task.findById(taskId);
         const project = await Project.findById(projectId);
-
         if (!task) {
             return res.status(404).send("Task was not found");
         }
-
         if (!project) {
             return res.status(404).send("Project was not found");
         }
-
         res.render("addTaskMember", { task, project }); // Pass the task and projectId to the view
     } catch (error) {
         console.error("Error fetching task or project:", error);
         res.status(500).send("Error fetching task or project.");
     }
 });
-
 app.post("/addTaskMember/:taskId", async (req, res) => {
     try {
-        const user = await User.findOne({ username: req.body.member });
-        
+        const user = await User.findOne({ username: req.body.member });       
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
-
         const { taskId } = req.params;
         const userId = user._id;
-
         // Update the user's tasks
         await User.findByIdAndUpdate(userId, { $addToSet: { tasks: taskId } });
         await Task.findByIdAndUpdate(taskId, { $addToSet: { users: userId } });
-
         // Send a JSON response
         res.status(200).json({ message: "Member added to the task successfully." });
     } catch (error) {
