@@ -6,10 +6,12 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Inicio de Sesion</title>
 </head>
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<link rel="stylesheet" href="/css/style.css">
 <body>
 
     <h1>Inicio de Sesion</h1>
+
+    <img src="/Jora.png" alt="Jora" width="440" height="228">
 
     <% if (message) { %>
         <p style="color: green;"><%= message %></p>
@@ -21,22 +23,17 @@
         <button type="submit">Iniciar Sesion</button>
     </form>
 
-    <br>
+    <br><br>
 
     <form action="/register" method="get" style="display: inline;">
-        <button type="submit">Registrarte</button>
+        <button type="submit">Registrate</button>
     </form>
 
-    <br>
-    <br>
+    <br><br>
 
     <form action="/recoverpwd" method="get" style="display: inline;">
-        <p>No recuerdas tu contraseña?</p>
-        <button type="submit">Recuperar tu contraseña</button>
+        <button type="submit">Recuperar contraseña</button>
     </form>
-
-    <br>
-    <br>
 
 </body>
 </html>

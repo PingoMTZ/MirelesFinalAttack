@@ -36,6 +36,7 @@ app.use(session({
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.set('view engine', 'ejs');
+app.use(express.static('public'));
 
 function isAuthenticated(req, res, next) {
     if (req.session.user) {
