@@ -3,18 +3,25 @@
 <html lang="es_mx">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Recuperar Contraseña</title>
 </head>
+<link rel="stylesheet" href="/css/style.css">
 <body>
+
     <h1>Recuperar Contraseña</h1>
+
     <form action="/recoverpwd" method="POST">
         <input type="text" name="username" placeholder="Nombre de Usuario" required>
         <input type="email" name="email" placeholder="Email" required>
         <button type="submit">Siguiente</button>
     </form>
 
+    <br><br>
+
     <form action="/" method="get" style="display: inline;">
-        <button type="submit">Regresar</button>
+        <button type="submit">Cancelar</button>
     </form>
 
 </body>

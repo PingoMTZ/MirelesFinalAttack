@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Proyectos</title>
 </head> 
+<link rel="stylesheet" href="/css/style.css">
 <body>
 
     <h1>Tus Proyectos</h1>
@@ -25,8 +26,6 @@
                         <form action="/project/edit/<%= project._id %>" method="get" style="display: inline;">
                             <button type="submit">Modificar</button>
                         </form>
-                        <br>
-                        
                         <form action="/deleteProject" method="POST" style="display: inline;">
                             <input type="hidden" name="userId" value="<%= userId %>">
                             <input type="hidden" name="projectId" value="<%= project._id %>">
@@ -39,35 +38,32 @@
             <li>No hay proyectos disponibles.</li>
         <% } %>        
     </ul>
-    
-    <!-- Buttons -->
+
+    <br><br>
 
     <form action="/createprojects" method="get" style="display: inline;">
         <input type="hidden" name="userId" value="<%= userId %>">
         <button type="submit">Crear proyecto</button>
     </form>
     
-    <br>
-    <br>
+    <br><br>
 
-    <form action="/logout" method="get" style="display: inline;">
-        <button type="submit">Cerrar sesión</button>
-    </form>
-    
     <form action="/changeuser" method="get" style="display: inline;">
-        <button type="submit">Cambiar nombre de usuario</button>
+        <button type="submit">Reestablecer nombre de usuario</button>
     </form>
 
     <form action="/changepwd" method="get" style="display: inline;">
-        <p>Recuerdas tu contraseña pero no te gusta?</p>
-        <button type="submit">Cambiar contraseña</button>
+        <button type="submit">Reestablecer contraseña</button>
     </form>
 
-    <br>
-    <br>
-    
     <form action="/delete" method="get" style="display: inline">
         <button type="submit">Eliminar usuario</button>
+    </form>
+
+    <br><br>
+    
+    <form action="/logout" method="get" style="display: inline;">
+        <button type="submit">Cerrar sesión</button>
     </form>
 
 </body>

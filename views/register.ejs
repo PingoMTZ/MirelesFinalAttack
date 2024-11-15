@@ -6,22 +6,22 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Registrar</title>
 </head>
+<link rel="stylesheet" href="/css/style.css">
 <body>
 
-    <h1>Registrarte en Jora</h1>
+    <h1>Registrate a Jora</h1>
 
     <form action="/register" method="POST">
         <input type="text" name="username" placeholder="Nombre de Usuario" required>
         <input type="email" name="email" placeholder="Email" required>
         <input type="password" name="password" placeholder="Contraseña" required>
-        <br>
         <input type="question" name="question" placeholder="Una pregunta la cual siempre sabras la respuesta" required style="width: calc(50% - 30px);">
-        <br>
         <input type="answer" name="answer" placeholder="Una respuesta que nunca olvidaras" required style="width: calc(50% - 30px);">
-        <br>
         <button type="submit">Registrar</button>
     </form>
-<br>
+    
+    <br><br>
+
     <form action="/" method="get" style="display: inline;">
         <button type="submit">Regresar</button>
     </form>
