@@ -44,7 +44,11 @@
                         <form action="/task/addMember/<%= task._id %>" method="get" style="display: inline;">
                             <input type="hidden" name="projectId" value="<%= project._id %>">
                             <button type="submit">Agregar Miembro a Tarea</button>
-                        </form>                       
+                        </form>    
+                        <form action="/task/deleteTaskMember/<%= task._id %>" method="get" style="display: inline;">
+                            <input type="hidden" name="projectId" value="<%= project._id %>">
+                            <button type="submit">Eliminar integrante de tarea</button>
+                        </form>                      
                     <% } %>
                 </li>
                 <hr>
@@ -61,11 +65,14 @@
 
     <% if (project.administrator.toString() === userId.toString()) { %>
         
-        <br>
-        <br>
+        <br><br>
 
         <form action="/addMember/<%= project._id %>" method="get" style="display: inline;">
             <button type="submit">Agregar Miembro</button>
+        </form>
+
+        <form action="/deleteMember/<%= project._id %>" method="get" style="display: inline;">
+            <button type="submit">Eliminar Miembro</button>
         </form>
     <% } %>
 

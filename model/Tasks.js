@@ -16,7 +16,7 @@ const TaskSchema = new mongoose.Schema({
     },
     progress: {
         type: String,
-        enum: ['No Iniciado', 'En Progreso', 'Terminada', 'We_are_Cooked_Chat'],
+        enum: ['No Iniciado', 'En Progreso', 'Terminada', 'We are Cooked Chat'],
         default: 'No Iniciado'
     },
     startDate: {
