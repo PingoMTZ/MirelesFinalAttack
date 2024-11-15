@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es_mx">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Eliminar miembro de una tarea</title>
+</head>
+<body>
+
+    <h1>Eliminar miembro de una tarea</h1>
+    
+    <form id="deleteTaskMemberForm" action="/task/deleteTaskMember/<%= taskId %>" method="POST">
+        <input type="hidden" name="projectId" value="<%= projectId %>"> <!-- Ensure projectId is sent with the form -->
+        <div class="form-group">
+            <label for="member">Selecciona un miembro</label>
+            <select class="form-control" id="member" name="userId" required>
+                <% if (availableUsers && availableUsers.length > 0) { %>
+                    <% availableUsers.forEach(function(user) { %>
+                        <option value="<%= user._id %>"><%= user.username %></option>
+                    <% }); %>
+                <% } else { %>
+                    <option value="" disabled>No hay usuarios asignados a esta tarea</option>
+                <% } %>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Eliminar miembro</button>
+        <a href="/project/<%= projectId %>" class="btn btn-secondary">Cancelar</a>
+    </form>
+    
+
+    <script>
+        document.getElementById("deleteTaskMemberForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            fetch('/task/deleteTaskMember/<%= taskId %>', {
+                method: 'POST',
+                body: new URLSearchParams(new FormData(this))
+            }).then(response => {
+                if (response.ok) {
+                    window.location.href = "/project/<%= projectId %>"; // Redirects to the projects page
+                } 
+            }).catch(error => console.error('Error:', error));
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

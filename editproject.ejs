@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es_mx">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Proyecto</title>
+</head>
+<body>
+
+    <h1>Editar Proyecto</h1>
+
+    <form action="/project/edit/<%= project._id %>" method="POST">
+        <div>
+            <label for="name">Nombre de Proyecto:</label>
+            <input type="text" id="name" name="name" value="<%= project.name %>" required>
+        </div>
+
+        <div>
+            <label for="description">Descripcion:</label>
+            <textarea id="description" name="description"><%= project.description %></textarea>
+        </div>
+
+        <div>
+            <label for="startDate">Fecha de Inicio:</label>
+            <input type="date" id="startDate" name="startDate" value="<%= new Date(project.startDate).toISOString().split('T')[0] %>" required>
+        </div>
+
+        <div>
+            <label for="endDate">Fecha de Cierre:</label>
+            <input type="date" id="endDate" name="endDate" value="<%= new Date(project.endDate).toISOString().split('T')[0] %>" required>
+        </div>
+
+        <button type="submit">Guardar Cambios</button>
+    </form>
+
+    <form action="/proyects" method="get">
+        <button type="submit">Cancelar</button>
+    </form>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function(event) {
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
+    
+            if (endDate < startDate) {
+                alert("La fecha de cierre no puede estar antes de la fecha de inicio.");
+                event.preventDefault(); // Prevent form submission
+            }
+        });
+    </script>    
+
+</body>
+</html>

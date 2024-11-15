@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es_mx">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cambiar Nombre</title>
+</head>
+<body>
+
+    <h1>Cambiar Nombre</h1>
+
+    <form id="changeUserForm">
+        <input type="text" name="oldUsername" placeholder="Nombre Anterior" required>
+        <input type="text" name="newUsername" placeholder="Nuevo Nombre" required>
+        <input type="password" name="password" placeholder="Contraseña" required>
+        <button type="submit">Cambiar</button>
+    </form>
+
+    <br>
+
+    <form action="/proyects" method="get" style="display: inline">
+        <button type="submit">Regresar</button>
+    </form>
+
+    <script>
+        document.getElementById("changeUserForm").addEventListener("submit", async (event) => {
+            event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch("/changeuser", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const message = await response.text();
+                alert(message);
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Error changing username");
+            }
+        });
+    </script>    
+    
+</body>
+</html>
