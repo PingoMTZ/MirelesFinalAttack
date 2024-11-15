@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Eliminar miembro del proyecto</title>
+</head> 
+<body>
+    <h1>Eliminar un integrante del proyecto</h1>
+
+
+    <form id="deleteMemberForm" action="/deleteProjectMember/<%= projectId %>" method="POST">
+        <div class="form-group">
+            <label for="member">Selecciona un miembro</label>
+            <select class="form-control" id="member" name="userId" required>
+                <% if (availableUsers && availableUsers.length > 0) { %>
+                    <% availableUsers.forEach(function(user) { %>
+                        <option value="<%= user._id %>"><%= user.username %></option>
+                    <% }); %>
+                <% } else { %>
+                    <option value="" disabled>Usuarios no disponibles</option>
+                <% } %>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Eliminar miembro</button>
+        <a href="/project/<%= projectId %>" class="btn btn-secondary">Cancelar</a>
+    </form>
+
+
+    <script>
+        document.getElementById("deleteMemberForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            fetch('/deleteProjectMember/<%= projectId %>', {
+                method: 'POST',
+                body: new URLSearchParams(new FormData(this))
+            }).then(response => {
+                if (response.ok) {
+                    window.location.href = "/project/<%= projectId %>"; // Redirects to the projects page
+                } else {
+                    alert("Failed to add member. Please try again.");
+                }
+            }).catch(error => console.error('Error:', error));
+        });
+    </script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

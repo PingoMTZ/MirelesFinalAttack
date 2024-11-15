@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es_mx">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Eliminar Usuario</title>
+</head>
+<body>
+
+    <h1>Eliminar Usuario</h1>
+
+    <form id="deleteForm">
+        <input type="text" name="username" placeholder="Nombre de Usuario" required>
+        <input type="password" name="password" placeholder="Contraseña" required>
+        <button type="submit">Eliminar</button>
+    </form>
+
+    <br>
+
+    <form action="/proyects" method="get" style="display: inline;">
+        <button type="submit">Cancelar</button>
+    </form>
+
+
+    <script>
+        document.getElementById("deleteForm").addEventListener("submit", async (event) => {
+            event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+    
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData);
+    
+            try {
+                const response = await fetch("/delete", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+    
+                if (response.ok) {
+                    const message = await response.json();
+                    alert(message.message); // Mostrar el mensaje de éxito
+                    window.location.href = "/"; // Redirigir al login
+                } else {
+                    const errorMessage = await response.text();
+                    alert(errorMessage); // Mostrar mensaje de error
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Error deleting user");
+            }
+        });
+    </script>
+      
+    
+</body>
+</html>

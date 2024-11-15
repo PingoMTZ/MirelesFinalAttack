@@ -500,6 +500,7 @@ app.post("/tasks", async (req, res) => {
 });
 
 
+
 app.get("/createTask/:projectId", isAuthenticated, async (req, res) => {
     const { projectId } = req.params;
 
@@ -616,7 +617,7 @@ app.post("/task/edit/:taskId", isAuthenticated, async (req, res) => {
 
         const updates = isAdmin
             ? { name, description, priority, progress, timeEstimation, comments }
-            : { comments, progress }; // Solo permitir comentarios si no es administrador
+            : { comments }; // Solo permitir comentarios si no es administrador
 
         if (isAdmin) {
             if (startDate) updates.startDate = new Date(startDate);
@@ -712,6 +713,70 @@ app.post("/addTaskMember/:taskId", async (req, res) => {
     }
 });
 
+app.get('/task/deleteTaskMember/:taskId', async (req, res) => {
+    const { taskId } = req.params;
+    const { projectId } = req.query;
+
+    try {
+        const task = await Tasks.findById(taskId).populate('users');
+
+        const taskMemberIds = task.users.map(member => member._id);
+        const availableUsers = await User.find({ _id: {  $in: taskMemberIds } });
+
+        res.render("deleteTaskMember", { taskId, projectId, availableUsers });
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        res.status(500).send("Error fetching users");
+    }
+});
+
+app.post('/task/deleteTaskMember/:taskId', async (req, res) => {
+    const { taskId } = req.params;
+
+    const { userId, projectId } = req.body;
+
+    await Tasks.findByIdAndUpdate(taskId, {
+        $pull: { users: userId }
+    });
+
+    await User.findByIdAndUpdate(userId, {
+        $pull: { tasks: taskId }
+    });
+
+    res.redirect(`/project/${projectId}`);
+
+});
+
+app.get("/deleteMember/:projectId", isAuthenticated, async (req, res) => {
+    const { projectId } = req.params;
+
+    try {
+        const project = await Project.findById(projectId).populate('members');
+
+        const projectMemberIds = project.members.map(member => member._id);
+        const availableUsers = await User.find({ _id: {  $in: projectMemberIds } });
+
+        res.render("deleteMember", { projectId, availableUsers });
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        res.status(500).send("Error fetching users");
+    }
+});
+
+app.post("/deleteProjectMember/:projectId", isAuthenticated, async (req, res) => {
+    const { projectId } = req.params;
+    const { userId } = req.body;
+
+    await Project.findByIdAndUpdate(projectId, {
+        $pull: { members: userId }
+    });
+
+    await User.findByIdAndUpdate(userId, {
+        $pull: { projects: projectId }
+    });
+
+    res.redirect(`/project/${projectId}`);
+});
 
 // Star server functions
 const port = process.env.PORT || 5001;
