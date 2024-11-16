@@ -32,7 +32,7 @@
                 <option value="alta" <%= task.priority === 'alta' ? 'selected' : '' %>>Alta</option>
             </select>
         </div>
-
+        <% } %>
         <div>
             <label for="progress">Progreso:</label>
             <select id="progress" name="progress">
@@ -42,7 +42,7 @@
                 <option value="We_are_Cooked_Chat" <%= task.progress === 'We_are_Cooked_Chat' ? 'selected' : '' %>>Cooked</option>
             </select>
         </div>
-
+        <% if (project.administrator.toString() === userId.toString()) { %>
         <div>
             <label for="startDate">Fecha de Inicio:</label>
             <input type="date" id="startDate" name="startDate" value="<%= new Date(task.startDate).toISOString().split('T')[0] %>" required>
@@ -52,7 +52,7 @@
             <label for="endDate">Fecha de Cierre:</label>
             <input type="date" id="endDate" name="endDate" value="<%= new Date(task.endDate).toISOString().split('T')[0] %>" required>
         </div>
-    <% } %>
+        <% } %>
 
     <!-- Siempre visible para todos los usuarios -->
     <div>
@@ -61,15 +61,6 @@
     </div>
 
 
-    <div>
-        <label for="progress">Progreso:</label>
-        <select id="progress" name="progress">
-            <option value="No Iniciado" <%= task.progress === 'No Iniciado' ? 'selected' : '' %>>Not Started</option>
-            <option value="En Progreso" <%= task.progress === 'En Progreso' ? 'selected' : '' %>>In Progress</option>
-            <option value="Terminada" <%= task.progress === 'Terminada' ? 'selected' : '' %>>Finished</option>
-            <option value="We_are_Cooked_Chat" <%= task.progress === 'We_are_Cooked_Chat' ? 'selected' : '' %>>Cooked</option>
-        </select>
-    </div>
 
     <button type="submit">Guardar</button>
     </form>
